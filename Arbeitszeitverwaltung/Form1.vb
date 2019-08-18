@@ -271,84 +271,140 @@ Public Class Form1
     Private Sub PrintDocument1_BeginPrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles PrintDocument1.BeginPrint
 
         PrintDocument1.OriginAtMargins = True
-        PrintDocument1.DefaultPageSettings.Margins = New Drawing.Printing.Margins(0, 0, 0, 0)
+        PrintDocument1.DefaultPageSettings.Margins = New Drawing.Printing.Margins(20, 20, 20, 20)
+        mRow = 0
+        newpage = True
 
-        pages = New Dictionary(Of Integer, pageDetails)
-
-        Dim maxWidth As Integer = CInt(PrintDocument1.DefaultPageSettings.PrintableArea.Width) - 40
-        Dim maxHeight As Integer = CInt(PrintDocument1.DefaultPageSettings.PrintableArea.Height) - 40
-
-        Dim pageCounter As Integer = 0
-        pages.Add(pageCounter, New pageDetails)
-
-        Dim columnCounter As Integer = 0
-
-        Dim columnSum As Integer = DataGridView1.RowHeadersWidth
-
-        For c As Integer = 0 To DataGridView1.Columns.Count - 1
-            If columnSum + DataGridView1.Columns(c).Width < maxWidth Then
-                columnSum += DataGridView1.Columns(c).Width
-                columnCounter += 1
-            Else
-                pages(pageCounter) = New pageDetails With {.columns = columnCounter, .rows = 0, .startCol = pages(pageCounter).startCol}
-                columnSum = DataGridView1.RowHeadersWidth + DataGridView1.Columns(c).Width
-                columnCounter = 1
-                pageCounter += 1
-                pages.Add(pageCounter, New pageDetails With {.startCol = c})
-            End If
-            If c = DataGridView1.Columns.Count - 1 Then
-                If pages(pageCounter).columns = 0 Then
-                    pages(pageCounter) = New pageDetails With {.columns = columnCounter, .rows = 0, .startCol = pages(pageCounter).startCol}
-                End If
-            End If
-        Next
-
-        maxPagesWide = pages.Keys.Max + 1
-
-        pageCounter = 0
-
-        Dim rowCounter As Integer = 0
-
-        Dim rowSum As Integer = DataGridView1.ColumnHeadersHeight
-
-        For r As Integer = 0 To DataGridView1.Rows.Count - 2
-            If rowSum + DataGridView1.Rows(r).Height < maxHeight Then
-                rowSum += DataGridView1.Rows(r).Height
-                rowCounter += 1
-            Else
-                pages(pageCounter) = New pageDetails With {.columns = pages(pageCounter).columns, .rows = rowCounter, .startCol = pages(pageCounter).startCol, .startRow = pages(pageCounter).startRow}
-                For x As Integer = 1 To maxPagesWide - 1
-                    pages(pageCounter + x) = New pageDetails With {.columns = pages(pageCounter + x).columns, .rows = rowCounter, .startCol = pages(pageCounter + x).startCol, .startRow = pages(pageCounter).startRow}
-                Next
-
-                pageCounter += maxPagesWide
-                For x As Integer = 0 To maxPagesWide - 1
-                    pages.Add(pageCounter + x, New pageDetails With {.columns = pages(x).columns, .rows = 0, .startCol = pages(x).startCol, .startRow = r})
-                Next
-
-                rowSum = DataGridView1.ColumnHeadersHeight + DataGridView1.Rows(r).Height
-                rowCounter = 1
-            End If
-            If r = DataGridView1.Rows.Count - 2 Then
-                For x As Integer = 0 To maxPagesWide - 1
-                    If pages(pageCounter + x).rows = 0 Then
-                        pages(pageCounter + x) = New pageDetails With {.columns = pages(pageCounter + x).columns, .rows = rowCounter, .startCol = pages(pageCounter + x).startCol, .startRow = pages(pageCounter + x).startRow}
-                    End If
-                Next
-            End If
-        Next
-
-        maxPagesTall = pages.Count \ maxPagesWide
 
     End Sub
 
+
+    Private mRow As Integer = 0
+    Private newpage As Boolean = True
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
 
-        Dim g As Graphics = e.Graphics
-        Dim pic As New Bitmap(DataGridView1.Width, DataGridView1.Height)
-        Dim Quadrat As New Rectangle(10, 10, DataGridView1.Width, DataGridView1.Height + 50)
-        DataGridView1.DrawToBitmap(pic, Quadrat)
-        g.DrawImage(pic, 0, 0)
+        ' sets it to show '...' for long text
+        Dim fmt As StringFormat = New StringFormat(StringFormatFlags.LineLimit)
+        fmt.LineAlignment = StringAlignment.Center
+        fmt.Trimming = StringTrimming.EllipsisCharacter
+        Dim y As Int32 = e.MarginBounds.Top
+        Dim rc As Rectangle
+        Dim x As Int32
+        Dim h As Int32 = 0
+        Dim row As DataGridViewRow
+
+        ' print the header text for a new page
+        '   use a grey bg just like the control
+        If newpage Then
+            row = DataGridView1.Rows(mRow)
+            x = e.MarginBounds.Left
+            For Each cell As DataGridViewCell In row.Cells
+                ' since we are printing the control's view,
+                ' skip invidible columns
+                If cell.Visible Then
+
+                    If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
+                        rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
+                    Else
+                        rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
+                    End If
+
+
+                    e.Graphics.FillRectangle(Brushes.LightGray, rc)
+                        e.Graphics.DrawRectangle(Pens.Black, rc)
+
+                        ' reused in the data pront - should be a function
+                        Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
+                            Case DataGridViewContentAlignment.BottomRight,
+                             DataGridViewContentAlignment.MiddleRight
+                                fmt.Alignment = StringAlignment.Far
+                                rc.Offset(-1, 0)
+                            Case DataGridViewContentAlignment.BottomCenter,
+                            DataGridViewContentAlignment.MiddleCenter
+                                fmt.Alignment = StringAlignment.Center
+                            Case Else
+                                fmt.Alignment = StringAlignment.Near
+                                rc.Offset(2, 0)
+                        End Select
+
+                        e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText,
+                                                DataGridView1.Font, Brushes.Black, rc, fmt)
+                        x += rc.Width
+                        h = Math.Max(h, rc.Height)
+                    End If
+            Next
+            y += h
+
+        End If
+        newpage = False
+
+        ' now print the data for each row
+        Dim thisNDX As Int32
+        For thisNDX = mRow To DataGridView1.RowCount - 1
+            ' no need to try to print the new row
+            If DataGridView1.Rows(thisNDX).IsNewRow Then Exit For
+
+            row = DataGridView1.Rows(thisNDX)
+            x = e.MarginBounds.Left
+            h = 0
+
+            ' reset X for data
+            x = e.MarginBounds.Left
+
+            ' print the data
+            For Each cell As DataGridViewCell In row.Cells
+                If cell.Visible Then
+                    If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
+                        rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
+                    Else
+                        rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
+                    End If
+
+
+                    ' SAMPLE CODE: How To 
+                    ' up a RowPrePaint rule
+                    'If Convert.ToDecimal(row.Cells(5).Value) < 9.99 Then
+                    '    Using br As New SolidBrush(Color.MistyRose)
+                    '        e.Graphics.FillRectangle(br, rc)
+                    '    End Using
+                    'End If
+
+                    e.Graphics.DrawRectangle(Pens.Black, rc)
+
+                    Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
+                        Case DataGridViewContentAlignment.BottomRight,
+                             DataGridViewContentAlignment.MiddleRight
+                            fmt.Alignment = StringAlignment.Far
+                            rc.Offset(-1, 0)
+                        Case DataGridViewContentAlignment.BottomCenter,
+                            DataGridViewContentAlignment.MiddleCenter
+                            fmt.Alignment = StringAlignment.Center
+                        Case Else
+                            fmt.Alignment = StringAlignment.Near
+                            rc.Offset(2, 0)
+                    End Select
+
+                    e.Graphics.DrawString(cell.FormattedValue.ToString(),
+                                          DataGridView1.Font, Brushes.Black, rc, fmt)
+
+                    x += rc.Width
+                    h = Math.Max(h, rc.Height)
+                End If
+
+            Next
+            y += h
+            ' next row to print
+            mRow = thisNDX + 1
+
+            If y + h > e.MarginBounds.Bottom Then
+                e.HasMorePages = True
+                ' mRow -= 1   causes last row to rePrint on next page
+                newpage = True
+                Return
+            End If
+        Next
+
+
 
     End Sub
 

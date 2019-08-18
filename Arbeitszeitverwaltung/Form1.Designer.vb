@@ -40,13 +40,14 @@ Partial Class Form1
         Me.BtnAdd = New System.Windows.Forms.Button()
         Me.BtnDruck = New System.Windows.Forms.Button()
         Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
+        Me.EinstellungenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DateiToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DateiToolStripMenuItem, Me.EinstellungenToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(800, 24)
@@ -63,19 +64,19 @@ Partial Class Form1
         'NeueDatenbankToolStripMenuItem
         '
         Me.NeueDatenbankToolStripMenuItem.Name = "NeueDatenbankToolStripMenuItem"
-        Me.NeueDatenbankToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.NeueDatenbankToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.NeueDatenbankToolStripMenuItem.Text = "Neue Datenbank"
         '
         'DatenbankÖffnenToolStripMenuItem
         '
         Me.DatenbankÖffnenToolStripMenuItem.Name = "DatenbankÖffnenToolStripMenuItem"
-        Me.DatenbankÖffnenToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.DatenbankÖffnenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.DatenbankÖffnenToolStripMenuItem.Text = "Datenbank öffnen"
         '
         'BeendenToolStripMenuItem
         '
         Me.BeendenToolStripMenuItem.Name = "BeendenToolStripMenuItem"
-        Me.BeendenToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+        Me.BeendenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.BeendenToolStripMenuItem.Text = "&Beenden"
         '
         'OpenFileDialog1
@@ -166,6 +167,15 @@ Partial Class Form1
         Me.BtnDruck.Text = "Druck aktuelle Ansicht"
         Me.BtnDruck.UseVisualStyleBackColor = True
         '
+        'PrintDocument1
+        '
+        '
+        'EinstellungenToolStripMenuItem
+        '
+        Me.EinstellungenToolStripMenuItem.Name = "EinstellungenToolStripMenuItem"
+        Me.EinstellungenToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
+        Me.EinstellungenToolStripMenuItem.Text = "&Einstellungen"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -204,4 +214,5 @@ Partial Class Form1
     Friend WithEvents SpDauerTag As DataGridViewTextBoxColumn
     Friend WithEvents BtnDruck As Button
     Friend WithEvents PrintDocument1 As Printing.PrintDocument
+    Friend WithEvents EinstellungenToolStripMenuItem As ToolStripMenuItem
 End Class
