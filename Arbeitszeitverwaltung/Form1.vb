@@ -343,55 +343,12 @@ Public Class Form1
     End Sub
 
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
-        Dim sf As New StringFormat
-        sf.Alignment = StringAlignment.Center
-        sf.LineAlignment = StringAlignment.Center
 
-        sf.Alignment = StringAlignment.Near
-
-        Dim startX As Integer = 50
-        Dim startY As Integer = 50
-
-        Static startPage As Integer = 0
-
-        For p As Integer = startPage To pages.Count - 1
-            Dim cell As New Rectangle(startX, startY, DataGridView1.RowHeadersWidth, DataGridView1.ColumnHeadersHeight)
-
-            startY += DataGridView1.ColumnHeadersHeight
-
-            startX += cell.Width
-            startY = 50
-
-            For c As Integer = pages(p).startCol To pages(p).startCol + pages(p).columns - 1
-                cell = New Rectangle(startX, startY, DataGridView1.Columns(c).Width + 10, DataGridView1.ColumnHeadersHeight)
-                e.Graphics.FillRectangle(New SolidBrush(SystemColors.ControlLight), cell)
-                e.Graphics.DrawRectangle(Pens.Black, cell)
-                e.Graphics.DrawString(DataGridView1.Columns(c).HeaderCell.Value.ToString, DataGridView1.Font, Brushes.Black, cell, sf)
-                startX += DataGridView1.Columns(c).Width + 10
-            Next
-
-            startY = DataGridView1.ColumnHeadersHeight + 50
-
-            For r As Integer = pages(p).startRow To pages(p).startRow + pages(p).rows '- 1
-                startX = 50 + DataGridView1.RowHeadersWidth
-                For c As Integer = pages(p).startCol To pages(p).startCol + pages(p).columns - 1
-                    cell = New Rectangle(startX, startY, DataGridView1.Columns(c).Width + 10, DataGridView1.Rows(r).Height)
-                    e.Graphics.DrawRectangle(Pens.Black, cell)
-                    e.Graphics.DrawString(DataGridView1(c, r).Value.ToString, DataGridView1.Font, Brushes.Black, cell, sf)
-                    startX += DataGridView1.Columns(c).Width + 10
-                Next
-                startY += DataGridView1.Rows(r).Height
-            Next
-
-            If p <> pages.Count - 1 Then
-                startPage = p + 1
-                e.HasMorePages = True
-                Return
-            Else
-                startPage = 0
-            End If
-
-        Next
+        Dim g As Graphics = e.Graphics
+        Dim pic As New Bitmap(DataGridView1.Width, DataGridView1.Height)
+        Dim Quadrat As New Rectangle(10, 10, DataGridView1.Width, DataGridView1.Height + 50)
+        DataGridView1.DrawToBitmap(pic, Quadrat)
+        g.DrawImage(pic, 0, 0)
 
     End Sub
 
