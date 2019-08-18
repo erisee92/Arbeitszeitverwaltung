@@ -408,5 +408,7 @@ Public Class Form1
 
     End Sub
 
-
+    Private Sub EinstellungenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EinstellungenToolStripMenuItem.Click
+        FrmEinstellungen.Show()
+    End Sub
 End Class

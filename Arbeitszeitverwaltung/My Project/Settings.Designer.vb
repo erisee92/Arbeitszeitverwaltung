@@ -65,6 +65,30 @@ Namespace My
                 Me("letzteDB") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property stdLohn() As Double
+            Get
+                Return CType(Me("stdLohn"),Double)
+            End Get
+            Set
+                Me("stdLohn") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property geplStunden() As Double
+            Get
+                Return CType(Me("geplStunden"),Double)
+            End Get
+            Set
+                Me("geplStunden") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
