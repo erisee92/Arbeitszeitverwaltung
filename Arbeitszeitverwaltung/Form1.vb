@@ -7,6 +7,25 @@ Public Class Form1
     Friend dbDateiPfad As String
     Dim ds As New DataSet
 
+    ''' <summary>
+    ''' structire to hold printed page details
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Structure pageDetails
+        Dim columns As Integer
+        Dim rows As Integer
+        Dim startCol As Integer
+        Dim startRow As Integer
+    End Structure
+    ''' <summary>
+    ''' dictionary to hold printed page details, with index key
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private pages As Dictionary(Of Integer, pageDetails)
+
+    Dim maxPagesWide As Integer
+    Dim maxPagesTall As Integer
+
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -16,7 +35,7 @@ Public Class Form1
         If My.Settings.letzteDB <> "" Then
             dbDateiPfad = My.Settings.letzteDB
             TabelleEinlesen()
-            CmdAdd.Enabled = True
+            BtnAdd.Enabled = True
         End If
 
     End Sub
@@ -29,7 +48,7 @@ Public Class Form1
         dbDateiPfad = OpenFileDialog1.FileName
         My.Settings.letzteDB = dbDateiPfad
         TabelleEinlesen()
-        CmdAdd.Enabled = True
+        BtnAdd.Enabled = True
     End Sub
 
     Private Sub NeueDatenbankToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NeueDatenbankToolStripMenuItem.Click
@@ -78,7 +97,7 @@ Public Class Form1
         MessageBox.Show("Datenbank gespeichert", "Speichern Erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
-    Private Sub CmdAdd_Click(sender As Object, e As EventArgs) Handles CmdAdd.Click
+    Private Sub BtnAdd_Click(sender As Object, e As EventArgs) Handles BtnAdd.Click
         Eingabe.ShowDialog()
     End Sub
 
@@ -147,7 +166,7 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
                                     If NeuerTag = False Then
@@ -169,7 +188,7 @@ Public Class Form1
                             End If
 
                         Case 1
-                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit")})
+                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
 
                             LetzteZeit = .Rows(i).Item("startzeit")
 
@@ -196,7 +215,7 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), Nothing, .Rows(i).Item("endzeit"), duration})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
 
@@ -204,7 +223,7 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
 
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), Nothing, .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                                     Tagessumme = TimeSpan.Zero
 
                                     NeuerTag = True
@@ -216,11 +235,11 @@ Public Class Form1
                                 If NeuerTag = False Then
                                     Tagessumme += duration
                                 End If
-                                DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), Nothing, .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                             End If
 
                         Case 3
-                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse")})
+                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
 
                     End Select
 
@@ -242,7 +261,137 @@ Public Class Form1
         Me.Close()
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub BtnDruck_Click(sender As Object, e As EventArgs) Handles BtnDruck.Click
+        Dim ppd As New PrintPreviewDialog
+        ppd.Document = PrintDocument1
+        ppd.WindowState = FormWindowState.Maximized
+        ppd.ShowDialog()
+    End Sub
+
+    Private Sub PrintDocument1_BeginPrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles PrintDocument1.BeginPrint
+
+        PrintDocument1.OriginAtMargins = True
+        PrintDocument1.DefaultPageSettings.Margins = New Drawing.Printing.Margins(0, 0, 0, 0)
+
+        pages = New Dictionary(Of Integer, pageDetails)
+
+        Dim maxWidth As Integer = CInt(PrintDocument1.DefaultPageSettings.PrintableArea.Width) - 40
+        Dim maxHeight As Integer = CInt(PrintDocument1.DefaultPageSettings.PrintableArea.Height) - 40
+
+        Dim pageCounter As Integer = 0
+        pages.Add(pageCounter, New pageDetails)
+
+        Dim columnCounter As Integer = 0
+
+        Dim columnSum As Integer = DataGridView1.RowHeadersWidth
+
+        For c As Integer = 0 To DataGridView1.Columns.Count - 1
+            If columnSum + DataGridView1.Columns(c).Width < maxWidth Then
+                columnSum += DataGridView1.Columns(c).Width
+                columnCounter += 1
+            Else
+                pages(pageCounter) = New pageDetails With {.columns = columnCounter, .rows = 0, .startCol = pages(pageCounter).startCol}
+                columnSum = DataGridView1.RowHeadersWidth + DataGridView1.Columns(c).Width
+                columnCounter = 1
+                pageCounter += 1
+                pages.Add(pageCounter, New pageDetails With {.startCol = c})
+            End If
+            If c = DataGridView1.Columns.Count - 1 Then
+                If pages(pageCounter).columns = 0 Then
+                    pages(pageCounter) = New pageDetails With {.columns = columnCounter, .rows = 0, .startCol = pages(pageCounter).startCol}
+                End If
+            End If
+        Next
+
+        maxPagesWide = pages.Keys.Max + 1
+
+        pageCounter = 0
+
+        Dim rowCounter As Integer = 0
+
+        Dim rowSum As Integer = DataGridView1.ColumnHeadersHeight
+
+        For r As Integer = 0 To DataGridView1.Rows.Count - 2
+            If rowSum + DataGridView1.Rows(r).Height < maxHeight Then
+                rowSum += DataGridView1.Rows(r).Height
+                rowCounter += 1
+            Else
+                pages(pageCounter) = New pageDetails With {.columns = pages(pageCounter).columns, .rows = rowCounter, .startCol = pages(pageCounter).startCol, .startRow = pages(pageCounter).startRow}
+                For x As Integer = 1 To maxPagesWide - 1
+                    pages(pageCounter + x) = New pageDetails With {.columns = pages(pageCounter + x).columns, .rows = rowCounter, .startCol = pages(pageCounter + x).startCol, .startRow = pages(pageCounter).startRow}
+                Next
+
+                pageCounter += maxPagesWide
+                For x As Integer = 0 To maxPagesWide - 1
+                    pages.Add(pageCounter + x, New pageDetails With {.columns = pages(x).columns, .rows = 0, .startCol = pages(x).startCol, .startRow = r})
+                Next
+
+                rowSum = DataGridView1.ColumnHeadersHeight + DataGridView1.Rows(r).Height
+                rowCounter = 1
+            End If
+            If r = DataGridView1.Rows.Count - 2 Then
+                For x As Integer = 0 To maxPagesWide - 1
+                    If pages(pageCounter + x).rows = 0 Then
+                        pages(pageCounter + x) = New pageDetails With {.columns = pages(pageCounter + x).columns, .rows = rowCounter, .startCol = pages(pageCounter + x).startCol, .startRow = pages(pageCounter + x).startRow}
+                    End If
+                Next
+            End If
+        Next
+
+        maxPagesTall = pages.Count \ maxPagesWide
+
+    End Sub
+
+    Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
+        Dim sf As New StringFormat
+        sf.Alignment = StringAlignment.Center
+        sf.LineAlignment = StringAlignment.Center
+
+        sf.Alignment = StringAlignment.Near
+
+        Dim startX As Integer = 50
+        Dim startY As Integer = 50
+
+        Static startPage As Integer = 0
+
+        For p As Integer = startPage To pages.Count - 1
+            Dim cell As New Rectangle(startX, startY, DataGridView1.RowHeadersWidth, DataGridView1.ColumnHeadersHeight)
+
+            startY += DataGridView1.ColumnHeadersHeight
+
+            startX += cell.Width
+            startY = 50
+
+            For c As Integer = pages(p).startCol To pages(p).startCol + pages(p).columns - 1
+                cell = New Rectangle(startX, startY, DataGridView1.Columns(c).Width + 10, DataGridView1.ColumnHeadersHeight)
+                e.Graphics.FillRectangle(New SolidBrush(SystemColors.ControlLight), cell)
+                e.Graphics.DrawRectangle(Pens.Black, cell)
+                e.Graphics.DrawString(DataGridView1.Columns(c).HeaderCell.Value.ToString, DataGridView1.Font, Brushes.Black, cell, sf)
+                startX += DataGridView1.Columns(c).Width + 10
+            Next
+
+            startY = DataGridView1.ColumnHeadersHeight + 50
+
+            For r As Integer = pages(p).startRow To pages(p).startRow + pages(p).rows '- 1
+                startX = 50 + DataGridView1.RowHeadersWidth
+                For c As Integer = pages(p).startCol To pages(p).startCol + pages(p).columns - 1
+                    cell = New Rectangle(startX, startY, DataGridView1.Columns(c).Width + 10, DataGridView1.Rows(r).Height)
+                    e.Graphics.DrawRectangle(Pens.Black, cell)
+                    e.Graphics.DrawString(DataGridView1(c, r).Value.ToString, DataGridView1.Font, Brushes.Black, cell, sf)
+                    startX += DataGridView1.Columns(c).Width + 10
+                Next
+                startY += DataGridView1.Rows(r).Height
+            Next
+
+            If p <> pages.Count - 1 Then
+                startPage = p + 1
+                e.HasMorePages = True
+                Return
+            Else
+                startPage = 0
+            End If
+
+        Next
 
     End Sub
 

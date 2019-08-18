@@ -37,8 +37,9 @@ Partial Class Form1
         Me.SpEnde = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.SpDauer = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.SpDauerTag = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.CmdAdd = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.BtnAdd = New System.Windows.Forms.Button()
+        Me.BtnDruck = New System.Windows.Forms.Button()
+        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -96,11 +97,12 @@ Partial Class Form1
         Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.SpTag, Me.SpStrasse, Me.SpStart, Me.SpEnde, Me.SpDauer, Me.SpDauerTag})
-        Me.DataGridView1.Location = New System.Drawing.Point(0, 27)
+        Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Left
+        Me.DataGridView1.Location = New System.Drawing.Point(0, 24)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.Size = New System.Drawing.Size(429, 421)
+        Me.DataGridView1.Size = New System.Drawing.Size(429, 426)
         Me.DataGridView1.TabIndex = 1
         '
         'SpTag
@@ -145,32 +147,32 @@ Partial Class Form1
         Me.SpDauerTag.ReadOnly = True
         Me.SpDauerTag.Width = 89
         '
-        'CmdAdd
+        'BtnAdd
         '
-        Me.CmdAdd.Enabled = False
-        Me.CmdAdd.Location = New System.Drawing.Point(533, 129)
-        Me.CmdAdd.Name = "CmdAdd"
-        Me.CmdAdd.Size = New System.Drawing.Size(111, 23)
-        Me.CmdAdd.TabIndex = 2
-        Me.CmdAdd.Text = "neue Einträge"
-        Me.CmdAdd.UseVisualStyleBackColor = True
+        Me.BtnAdd.Enabled = False
+        Me.BtnAdd.Location = New System.Drawing.Point(549, 39)
+        Me.BtnAdd.Name = "BtnAdd"
+        Me.BtnAdd.Size = New System.Drawing.Size(111, 23)
+        Me.BtnAdd.TabIndex = 2
+        Me.BtnAdd.Text = "neue Einträge"
+        Me.BtnAdd.UseVisualStyleBackColor = True
         '
-        'Button1
+        'BtnDruck
         '
-        Me.Button1.Location = New System.Drawing.Point(533, 174)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 3
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.BtnDruck.Location = New System.Drawing.Point(549, 84)
+        Me.BtnDruck.Name = "BtnDruck"
+        Me.BtnDruck.Size = New System.Drawing.Size(111, 41)
+        Me.BtnDruck.TabIndex = 3
+        Me.BtnDruck.Text = "Druck aktuelle Ansicht"
+        Me.BtnDruck.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
-        Me.Controls.Add(Me.Button1)
-        Me.Controls.Add(Me.CmdAdd)
+        Me.Controls.Add(Me.BtnDruck)
+        Me.Controls.Add(Me.BtnAdd)
         Me.Controls.Add(Me.DataGridView1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -193,12 +195,13 @@ Partial Class Form1
     Friend WithEvents NeueDatenbankToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
     Friend WithEvents DataGridView1 As DataGridView
-    Friend WithEvents CmdAdd As Button
+    Friend WithEvents BtnAdd As Button
     Friend WithEvents SpTag As DataGridViewTextBoxColumn
     Friend WithEvents SpStrasse As DataGridViewTextBoxColumn
     Friend WithEvents SpStart As DataGridViewTextBoxColumn
     Friend WithEvents SpEnde As DataGridViewTextBoxColumn
     Friend WithEvents SpDauer As DataGridViewTextBoxColumn
     Friend WithEvents SpDauerTag As DataGridViewTextBoxColumn
-    Friend WithEvents Button1 As Button
+    Friend WithEvents BtnDruck As Button
+    Friend WithEvents PrintDocument1 As Printing.PrintDocument
 End Class
