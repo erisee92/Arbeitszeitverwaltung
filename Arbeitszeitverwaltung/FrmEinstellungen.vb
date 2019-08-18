@@ -11,6 +11,7 @@
     Private Sub BtnSpeichern_Click(sender As Object, e As EventArgs) Handles BtnSpeichern.Click
         My.Settings.geplStunden = TBgeplStd.Text
         My.Settings.stdLohn = TBStdLohn.Text
+        Form1.AktualisiereAbbrechnung()
         Me.Close()
     End Sub
 End Class

@@ -35,7 +35,7 @@ Public Class Eingabe
 
     Private Sub BtnHinzu_Click(sender As Object, e As EventArgs) Handles BtnHinzu.Click
 
-        Dim datum = DTPDatum.Value.ToString("dd.MM.yyyy")
+        Dim datum = DTPDatum.Value.ToString("yyyy-MM-dd")
         Dim strasse As String = TBStrasse.Text
         Dim startZeit = DTPStart.Value.ToString("HH:mm")
         Dim endZeit = DTPEnde.Value.ToString("HH:mm")
@@ -59,45 +59,50 @@ Public Class Eingabe
 
         Dim SId
 
-        'Try
-        con.Open()
+        Try
+            con.Open()
 
-        SId = cmd.ExecuteScalar
+            SId = cmd.ExecuteScalar
 
-        If SId = Nothing Then
-            Querry = "INSERT INTO Strassen(Strasse) VALUES ('" & TBStrasse.Text & "');"
+            If SId = Nothing Then
+                Querry = "INSERT INTO Strassen(Strasse) VALUES ('" & TBStrasse.Text & "');"
+                cmd.CommandText = Querry
+                cmd.ExecuteNonQuery()
+
+                Querry = "SELECT max(SId) FROM Strassen"
+                cmd.CommandText = Querry
+                SId = cmd.ExecuteScalar
+            End If
+
+            If DTPStart.Checked = True And DTPEnde.Checked = True Then
+                Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit, endzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "', '" & endZeit & "');"
+                DTPEnde.Checked = False
+
+            ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
+                Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "');"
+                DTPStart.Checked = False
+
+            ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
+                Querry = "INSERT INTO Zeiten(datum, fkStrasse, endzeit) VALUES ('" & datum & "', " & SId & ", '" & endZeit & "');"
+                DTPStart.Checked = True
+                DTPEnde.Checked = False
+
+            Else
+                Querry = "INSERT INTO Zeiten(datum, fkStrasse ) VALUES ('" & datum & "', " & SId & ");"
+            End If
+
             cmd.CommandText = Querry
+
             cmd.ExecuteNonQuery()
 
-            Querry = "SELECT max(SId) FROM Strassen"
-            cmd.CommandText = Querry
-            SId = cmd.ExecuteScalar
-        End If
+            con.Close()
 
-        If DTPStart.Checked = True And DTPEnde.Checked = True Then
-            Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit, endzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "', '" & endZeit & "');"
+            Form1.TabelleEinlesen()
+            Form1.AktualisiereAbbrechnung()
 
-        ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
-            Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "');"
-
-        ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
-            Querry = "INSERT INTO Zeiten(datum, fkStrasse, endzeit) VALUES ('" & datum & "', " & SId & ", '" & endZeit & "');"
-
-        Else
-            Querry = "INSERT INTO Zeiten(datum, fkStrasse ) VALUES ('" & datum & "', " & SId & ");"
-        End If
-
-        cmd.CommandText = Querry
-
-        cmd.ExecuteNonQuery()
-
-        con.Close()
-
-        Form1.TabelleEinlesen()
-
-        'Catch ex As Exception
-        '    MessageBox.Show(ex.Message)
-        'End Try
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
     End Sub
 
 End Class

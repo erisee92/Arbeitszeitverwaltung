@@ -7,25 +7,10 @@ Public Class Form1
     Friend dbDateiPfad As String
     Dim ds As New DataSet
 
-    ''' <summary>
-    ''' structire to hold printed page details
-    ''' </summary>
-    ''' <remarks></remarks>
-    Private Structure pageDetails
-        Dim columns As Integer
-        Dim rows As Integer
-        Dim startCol As Integer
-        Dim startRow As Integer
-    End Structure
-    ''' <summary>
-    ''' dictionary to hold printed page details, with index key
-    ''' </summary>
-    ''' <remarks></remarks>
-    Private pages As Dictionary(Of Integer, pageDetails)
+    Private mRow As Integer = 0
+    Private newpage As Boolean = True
 
-    Dim maxPagesWide As Integer
-    Dim maxPagesTall As Integer
-
+    Private monatssumme As TimeSpan = TimeSpan.Zero
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -34,9 +19,12 @@ Public Class Form1
 
         If My.Settings.letzteDB <> "" Then
             dbDateiPfad = My.Settings.letzteDB
-            TabelleEinlesen()
+            'TabelleEinlesen()
+            'AktualisiereAbbrechnung()
             BtnAdd.Enabled = True
         End If
+
+        CBMonat.SelectedIndex = Date.Today.Month - 1
 
     End Sub
 
@@ -48,6 +36,7 @@ Public Class Form1
         dbDateiPfad = OpenFileDialog1.FileName
         My.Settings.letzteDB = dbDateiPfad
         TabelleEinlesen()
+        AktualisiereAbbrechnung()
         BtnAdd.Enabled = True
     End Sub
 
@@ -94,6 +83,11 @@ Public Class Form1
             MessageBox.Show(ex.Message)
             Exit Sub
         End Try
+
+        My.Settings.letzteDB = SaveFileDialog1.FileName
+        dbDateiPfad = SaveFileDialog1.FileName
+        TabelleEinlesen()
+
         MessageBox.Show("Datenbank gespeichert", "Speichern Erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
@@ -106,18 +100,32 @@ Public Class Form1
 
         DataGridView1.Rows.Clear()
         ds.Clear()
+        monatssumme = TimeSpan.Zero
 
         Dim cmdEintraege As SQLiteCommand
         con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
         cmdEintraege = con.CreateCommand()
-        Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId"
+        Dim monat As String = ""
+        Dim nmonat As String = ""
+
+        If (CBMonat.SelectedIndex + 1) < 10 Then
+            monat = "0" & (CBMonat.SelectedIndex + 1)
+            nmonat = "0" & (CBMonat.SelectedIndex + 2)
+        Else
+            monat = "" & (CBMonat.SelectedIndex + 1)
+            nmonat = "" & (CBMonat.SelectedIndex + 2)
+        End If
+
+
+
+        Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('2019-" & monat & "-01') AND date(datum) < date('2019-" & nmonat & "-01')"
 
         Dim LetzteZeit As Date
         Dim Tagessumme As TimeSpan = TimeSpan.Zero
         Dim NeuerTag As Boolean = True
 
-        Dim Background1 As Color = Color.FromArgb(&HFF64B5F6)
-        Dim Background2 As Color = Color.FromArgb(&HFF9BE7FF)
+        Dim Background1 As Color = Color.FromArgb(&HFF90CAF9)
+        Dim Background2 As Color = Color.FromArgb(&HFFC3FDFF)
         Dim aktFarbe As Color = Background1
 
 
@@ -129,6 +137,11 @@ Public Class Form1
 
             For i As Integer = 0 To ds.Tables(0).Rows.Count - 1
                 With ds.Tables(0)
+
+                    Dim datum As Date = .Rows(i).Item("datum")
+
+
+
 
                     Dim test = 0
 
@@ -166,13 +179,14 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
+                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
                                     If NeuerTag = False Then
                                         Tagessumme += duration
                                     End If
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    monatssumme += Tagessumme
                                     Tagessumme = TimeSpan.Zero
 
                                     NeuerTag = True
@@ -184,11 +198,12 @@ Public Class Form1
                                 If NeuerTag = False Then
                                     Tagessumme += duration
                                 End If
-                                DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                monatssumme += Tagessumme
                             End If
 
                         Case 1
-                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
+                            DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
 
                             LetzteZeit = .Rows(i).Item("startzeit")
 
@@ -215,7 +230,7 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
+                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
 
@@ -223,7 +238,8 @@ Public Class Form1
                                         Tagessumme += duration
                                     End If
 
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    monatssumme += Tagessumme
                                     Tagessumme = TimeSpan.Zero
 
                                     NeuerTag = True
@@ -235,11 +251,12 @@ Public Class Form1
                                 If NeuerTag = False Then
                                     Tagessumme += duration
                                 End If
-                                DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                monatssumme += Tagessumme
                             End If
 
                         Case 3
-                            DataGridView1.Rows.Add({ .Rows(i).Item("datum"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
+                            DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
 
                     End Select
 
@@ -279,8 +296,7 @@ Public Class Form1
     End Sub
 
 
-    Private mRow As Integer = 0
-    Private newpage As Boolean = True
+    ' https://stackoverflow.com/questions/41015287/how-to-print-datagridview-table-with-its-header-in-vb-net
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
 
         ' sets it to show '...' for long text
@@ -309,31 +325,62 @@ Public Class Form1
                         rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
                     End If
 
+                    Using br As New SolidBrush(Color.FromArgb(&HFF0069C0))
+                        e.Graphics.FillRectangle(br, rc)
+                    End Using
 
-                    e.Graphics.FillRectangle(Brushes.LightGray, rc)
-                        e.Graphics.DrawRectangle(Pens.Black, rc)
+                    e.Graphics.DrawRectangle(Pens.Black, rc)
 
-                        ' reused in the data pront - should be a function
-                        Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
-                            Case DataGridViewContentAlignment.BottomRight,
-                             DataGridViewContentAlignment.MiddleRight
-                                fmt.Alignment = StringAlignment.Far
-                                rc.Offset(-1, 0)
-                            Case DataGridViewContentAlignment.BottomCenter,
-                            DataGridViewContentAlignment.MiddleCenter
-                                fmt.Alignment = StringAlignment.Center
-                            Case Else
-                                fmt.Alignment = StringAlignment.Near
-                                rc.Offset(2, 0)
-                        End Select
+                    ' reused in the data pront - should be a function
+                    Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
+                        Case DataGridViewContentAlignment.BottomRight,
+                            DataGridViewContentAlignment.MiddleRight
+                            fmt.Alignment = StringAlignment.Far
+                            rc.Offset(-1, 0)
+                        Case DataGridViewContentAlignment.BottomCenter,
+                        DataGridViewContentAlignment.MiddleCenter
+                            fmt.Alignment = StringAlignment.Center
+                        Case Else
+                            fmt.Alignment = StringAlignment.Near
+                            rc.Offset(2, 0)
+                    End Select
 
-                        e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText,
-                                                DataGridView1.Font, Brushes.Black, rc, fmt)
-                        x += rc.Width
-                        h = Math.Max(h, rc.Height)
-                    End If
+                    e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText,
+                                            DataGridView1.Font, Brushes.White, rc, fmt)
+                    x += rc.Width
+                    h = Math.Max(h, rc.Height)
+                End If
             Next
-            y += h
+
+            ' Lohnrechnung
+
+            x += 20
+            y = e.MarginBounds.Top + 20
+
+            e.Graphics.DrawString(Label1.Text, Label1.Font, Brushes.Black, x, y)
+            x += 150
+            e.Graphics.DrawString(TBSumme.Text, TBSumme.Font, Brushes.Black, x, y)
+            y += Label1.Height + 5
+
+            x -= 150
+            e.Graphics.DrawString(Label2.Text, Label2.Font, Brushes.Black, x, y)
+            x += 150
+            e.Graphics.DrawString(TBLohn.Text, TBLohn.Font, Brushes.Black, x, y)
+            y += Label1.Height + 5
+
+            x -= 150
+            e.Graphics.DrawString(Label3.Text, Label3.Font, Brushes.Black, x, y)
+            x += 150
+            e.Graphics.DrawString(TBUeberStd.Text, TBUeberStd.Font, Brushes.Black, x, y)
+            y += Label1.Height + 5
+
+            x -= 150
+            e.Graphics.DrawString(Label4.Text, Label4.Font, Brushes.Black, x, y)
+            x += 150
+            e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
+            y += Label1.Height + 5
+
+            y = h + e.MarginBounds.Top
 
         End If
         newpage = False
@@ -345,7 +392,6 @@ Public Class Form1
             If DataGridView1.Rows(thisNDX).IsNewRow Then Exit For
 
             row = DataGridView1.Rows(thisNDX)
-            x = e.MarginBounds.Left
             h = 0
 
             ' reset X for data
@@ -361,13 +407,11 @@ Public Class Form1
                     End If
 
 
-                    ' SAMPLE CODE: How To 
-                    ' up a RowPrePaint rule
-                    'If Convert.ToDecimal(row.Cells(5).Value) < 9.99 Then
-                    '    Using br As New SolidBrush(Color.MistyRose)
-                    '        e.Graphics.FillRectangle(br, rc)
-                    '    End Using
-                    'End If
+
+
+                    Using br As New SolidBrush(cell.Style.BackColor)
+                        e.Graphics.FillRectangle(br, rc)
+                    End Using
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
 
@@ -406,9 +450,41 @@ Public Class Form1
 
 
 
+
+
     End Sub
 
     Private Sub EinstellungenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EinstellungenToolStripMenuItem.Click
         FrmEinstellungen.Show()
+    End Sub
+
+    Friend Sub AktualisiereAbbrechnung()
+        Dim lohn As Double
+        Dim lohnUeber As Double
+        Dim lohnGes As Double
+
+        Label2.Text = "Lohn bis " & Format(My.Settings.geplStunden, "#0.00") & "h (" & FormatCurrency(My.Settings.stdLohn, 2) & "):"
+        Label3.Text = "Lohn über " & Format(My.Settings.geplStunden, "#0.00") & "h:"
+
+        TBSumme.Text = Format(monatssumme.TotalHours, "#0.00")
+
+        If monatssumme.TotalHours <= My.Settings.geplStunden Then
+            lohn = monatssumme.TotalHours * My.Settings.stdLohn
+            lohnUeber = 0
+        Else
+            lohn = My.Settings.geplStunden * My.Settings.stdLohn
+            lohnUeber = (monatssumme.TotalHours - My.Settings.geplStunden) * My.Settings.stdLohn
+        End If
+
+        lohnGes = lohn + lohnUeber
+
+        TBLohn.Text = FormatCurrency(lohn, 2)
+        TBUeberStd.Text = FormatCurrency(lohnUeber, 2)
+        TBLohnGes.Text = FormatCurrency(lohnGes, 2)
+    End Sub
+
+    Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
+        TabelleEinlesen()
+        AktualisiereAbbrechnung()
     End Sub
 End Class

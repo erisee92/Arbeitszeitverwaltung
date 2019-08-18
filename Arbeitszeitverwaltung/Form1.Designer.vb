@@ -28,6 +28,7 @@ Partial Class Form1
         Me.NeueDatenbankToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DatenbankÖffnenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BeendenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EinstellungenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
@@ -40,17 +41,19 @@ Partial Class Form1
         Me.BtnAdd = New System.Windows.Forms.Button()
         Me.BtnDruck = New System.Windows.Forms.Button()
         Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
-        Me.EinstellungenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.TextBox2 = New System.Windows.Forms.TextBox()
-        Me.TextBox3 = New System.Windows.Forms.TextBox()
-        Me.TextBox4 = New System.Windows.Forms.TextBox()
+        Me.TBSumme = New System.Windows.Forms.TextBox()
+        Me.TBLohn = New System.Windows.Forms.TextBox()
+        Me.TBUeberStd = New System.Windows.Forms.TextBox()
+        Me.TBLohnGes = New System.Windows.Forms.TextBox()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.CBMonat = New System.Windows.Forms.ComboBox()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -72,20 +75,26 @@ Partial Class Form1
         'NeueDatenbankToolStripMenuItem
         '
         Me.NeueDatenbankToolStripMenuItem.Name = "NeueDatenbankToolStripMenuItem"
-        Me.NeueDatenbankToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.NeueDatenbankToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.NeueDatenbankToolStripMenuItem.Text = "Neue Datenbank"
         '
         'DatenbankÖffnenToolStripMenuItem
         '
         Me.DatenbankÖffnenToolStripMenuItem.Name = "DatenbankÖffnenToolStripMenuItem"
-        Me.DatenbankÖffnenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.DatenbankÖffnenToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.DatenbankÖffnenToolStripMenuItem.Text = "Datenbank öffnen"
         '
         'BeendenToolStripMenuItem
         '
         Me.BeendenToolStripMenuItem.Name = "BeendenToolStripMenuItem"
-        Me.BeendenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.BeendenToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.BeendenToolStripMenuItem.Text = "&Beenden"
+        '
+        'EinstellungenToolStripMenuItem
+        '
+        Me.EinstellungenToolStripMenuItem.Name = "EinstellungenToolStripMenuItem"
+        Me.EinstellungenToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
+        Me.EinstellungenToolStripMenuItem.Text = "&Einstellungen"
         '
         'OpenFileDialog1
         '
@@ -103,15 +112,18 @@ Partial Class Form1
         '
         Me.DataGridView1.AllowUserToAddRows = False
         Me.DataGridView1.AllowUserToDeleteRows = False
+        Me.DataGridView1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
+        Me.DataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.SpTag, Me.SpStrasse, Me.SpStart, Me.SpEnde, Me.SpDauer, Me.SpDauerTag})
-        Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Left
         Me.DataGridView1.Location = New System.Drawing.Point(0, 24)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.Size = New System.Drawing.Size(429, 426)
+        Me.DataGridView1.Size = New System.Drawing.Size(414, 426)
         Me.DataGridView1.TabIndex = 1
         '
         'SpTag
@@ -159,7 +171,7 @@ Partial Class Form1
         'BtnAdd
         '
         Me.BtnAdd.Enabled = False
-        Me.BtnAdd.Location = New System.Drawing.Point(549, 39)
+        Me.BtnAdd.Location = New System.Drawing.Point(46, 6)
         Me.BtnAdd.Name = "BtnAdd"
         Me.BtnAdd.Size = New System.Drawing.Size(111, 23)
         Me.BtnAdd.TabIndex = 2
@@ -168,26 +180,20 @@ Partial Class Form1
         '
         'BtnDruck
         '
-        Me.BtnDruck.Location = New System.Drawing.Point(549, 84)
+        Me.BtnDruck.Location = New System.Drawing.Point(46, 51)
         Me.BtnDruck.Name = "BtnDruck"
         Me.BtnDruck.Size = New System.Drawing.Size(111, 41)
         Me.BtnDruck.TabIndex = 3
-        Me.BtnDruck.Text = "Druck aktuelle Ansicht"
+        Me.BtnDruck.Text = "Drucke aktuelle Ansicht"
         Me.BtnDruck.UseVisualStyleBackColor = True
         '
         'PrintDocument1
         '
         '
-        'EinstellungenToolStripMenuItem
-        '
-        Me.EinstellungenToolStripMenuItem.Name = "EinstellungenToolStripMenuItem"
-        Me.EinstellungenToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
-        Me.EinstellungenToolStripMenuItem.Text = "&Einstellungen"
-        '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(486, 159)
+        Me.Label1.Location = New System.Drawing.Point(43, 126)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(54, 13)
         Me.Label1.TabIndex = 4
@@ -196,77 +202,96 @@ Partial Class Form1
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(486, 182)
+        Me.Label2.Location = New System.Drawing.Point(43, 149)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(113, 13)
+        Me.Label2.Size = New System.Drawing.Size(101, 13)
         Me.Label2.TabIndex = 5
-        Me.Label2.Text = "Lohn bis 110h (9,50€):"
+        Me.Label2.Text = "Lohn bis 0h (0,00€):"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(486, 205)
+        Me.Label3.Location = New System.Drawing.Point(43, 172)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(60, 13)
+        Me.Label3.Size = New System.Drawing.Size(48, 13)
         Me.Label3.TabIndex = 6
-        Me.Label3.Text = "Über 110h:"
+        Me.Label3.Text = "Über 0h:"
         '
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(486, 228)
+        Me.Label4.Location = New System.Drawing.Point(43, 195)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(46, 13)
         Me.Label4.TabIndex = 7
         Me.Label4.Text = "Gesamt:"
         '
-        'TextBox1
+        'TBSumme
         '
-        Me.TextBox1.Location = New System.Drawing.Point(610, 151)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.ReadOnly = True
-        Me.TextBox1.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox1.TabIndex = 8
+        Me.TBSumme.Location = New System.Drawing.Point(193, 119)
+        Me.TBSumme.Name = "TBSumme"
+        Me.TBSumme.ReadOnly = True
+        Me.TBSumme.Size = New System.Drawing.Size(100, 20)
+        Me.TBSumme.TabIndex = 8
         '
-        'TextBox2
+        'TBLohn
         '
-        Me.TextBox2.Location = New System.Drawing.Point(610, 174)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.ReadOnly = True
-        Me.TextBox2.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox2.TabIndex = 8
+        Me.TBLohn.Location = New System.Drawing.Point(193, 142)
+        Me.TBLohn.Name = "TBLohn"
+        Me.TBLohn.ReadOnly = True
+        Me.TBLohn.Size = New System.Drawing.Size(100, 20)
+        Me.TBLohn.TabIndex = 8
         '
-        'TextBox3
+        'TBUeberStd
         '
-        Me.TextBox3.Location = New System.Drawing.Point(610, 197)
-        Me.TextBox3.Name = "TextBox3"
-        Me.TextBox3.ReadOnly = True
-        Me.TextBox3.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox3.TabIndex = 8
+        Me.TBUeberStd.Location = New System.Drawing.Point(193, 165)
+        Me.TBUeberStd.Name = "TBUeberStd"
+        Me.TBUeberStd.ReadOnly = True
+        Me.TBUeberStd.Size = New System.Drawing.Size(100, 20)
+        Me.TBUeberStd.TabIndex = 8
         '
-        'TextBox4
+        'TBLohnGes
         '
-        Me.TextBox4.Location = New System.Drawing.Point(610, 220)
-        Me.TextBox4.Name = "TextBox4"
-        Me.TextBox4.ReadOnly = True
-        Me.TextBox4.Size = New System.Drawing.Size(100, 20)
-        Me.TextBox4.TabIndex = 8
+        Me.TBLohnGes.Location = New System.Drawing.Point(193, 188)
+        Me.TBLohnGes.Name = "TBLohnGes"
+        Me.TBLohnGes.ReadOnly = True
+        Me.TBLohnGes.Size = New System.Drawing.Size(100, 20)
+        Me.TBLohnGes.TabIndex = 8
+        '
+        'Panel1
+        '
+        Me.Panel1.Controls.Add(Me.CBMonat)
+        Me.Panel1.Controls.Add(Me.TBLohnGes)
+        Me.Panel1.Controls.Add(Me.TBUeberStd)
+        Me.Panel1.Controls.Add(Me.TBLohn)
+        Me.Panel1.Controls.Add(Me.TBSumme)
+        Me.Panel1.Controls.Add(Me.Label4)
+        Me.Panel1.Controls.Add(Me.Label3)
+        Me.Panel1.Controls.Add(Me.Label2)
+        Me.Panel1.Controls.Add(Me.Label1)
+        Me.Panel1.Controls.Add(Me.BtnDruck)
+        Me.Panel1.Controls.Add(Me.BtnAdd)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Right
+        Me.Panel1.Location = New System.Drawing.Point(420, 24)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(380, 426)
+        Me.Panel1.TabIndex = 9
+        '
+        'CBMonat
+        '
+        Me.CBMonat.FormattingEnabled = True
+        Me.CBMonat.Items.AddRange(New Object() {"Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"})
+        Me.CBMonat.Location = New System.Drawing.Point(193, 36)
+        Me.CBMonat.Name = "CBMonat"
+        Me.CBMonat.Size = New System.Drawing.Size(121, 21)
+        Me.CBMonat.TabIndex = 10
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
-        Me.Controls.Add(Me.TextBox4)
-        Me.Controls.Add(Me.TextBox3)
-        Me.Controls.Add(Me.TextBox2)
-        Me.Controls.Add(Me.TextBox1)
-        Me.Controls.Add(Me.Label4)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.BtnDruck)
-        Me.Controls.Add(Me.BtnAdd)
+        Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.DataGridView1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -276,6 +301,8 @@ Partial Class Form1
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -303,8 +330,10 @@ Partial Class Form1
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents Label4 As Label
-    Friend WithEvents TextBox1 As TextBox
-    Friend WithEvents TextBox2 As TextBox
-    Friend WithEvents TextBox3 As TextBox
-    Friend WithEvents TextBox4 As TextBox
+    Friend WithEvents TBSumme As TextBox
+    Friend WithEvents TBLohn As TextBox
+    Friend WithEvents TBUeberStd As TextBox
+    Friend WithEvents TBLohnGes As TextBox
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents CBMonat As ComboBox
 End Class
