@@ -12,15 +12,13 @@ Public Class Form1
 
     Private monatssumme As TimeSpan = TimeSpan.Zero
 
-
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         OpenFileDialog1.InitialDirectory = My.Application.Info.DirectoryPath
         SaveFileDialog1.InitialDirectory = My.Application.Info.DirectoryPath
 
         If My.Settings.letzteDB <> "" Then
             dbDateiPfad = My.Settings.letzteDB
-            'TabelleEinlesen()
-            'AktualisiereAbbrechnung()
             BtnAdd.Enabled = True
         End If
 
@@ -55,7 +53,6 @@ Public Class Form1
             ' Muss erst irgendwo freigegeben werden
             File.Delete(SaveFileDialog1.FileName)
         End If
-
 
         con.ConnectionString = "Data Source=" & SaveFileDialog1.FileName & ";"
         cmd = con.CreateCommand()
@@ -102,6 +99,11 @@ Public Class Form1
         ds.Clear()
         monatssumme = TimeSpan.Zero
 
+        If Not File.Exists(dbDateiPfad) Then
+            MsgBox("Alte Datei nicht gefunden. Bitte neue erstellen oder laden.")
+            Exit Sub
+        End If
+
         Dim cmdEintraege As SQLiteCommand
         con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
         cmdEintraege = con.CreateCommand()
@@ -116,8 +118,6 @@ Public Class Form1
             nmonat = "" & (CBMonat.SelectedIndex + 2)
         End If
 
-
-
         Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('2019-" & monat & "-01') AND date(datum) < date('2019-" & nmonat & "-01')"
 
         Dim LetzteZeit As Date
@@ -127,7 +127,6 @@ Public Class Form1
         Dim Background1 As Color = Color.FromArgb(&HFF90CAF9)
         Dim Background2 As Color = Color.FromArgb(&HFFC3FDFF)
         Dim aktFarbe As Color = Background1
-
 
         Try
             con.Open()
@@ -139,9 +138,6 @@ Public Class Form1
                 With ds.Tables(0)
 
                     Dim datum As Date = .Rows(i).Item("datum")
-
-
-
 
                     Dim test = 0
 
@@ -191,7 +187,6 @@ Public Class Form1
 
                                     NeuerTag = True
 
-
                                 End If
 
                             Else
@@ -203,6 +198,9 @@ Public Class Form1
                             End If
 
                         Case 1
+                            If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
+                                NeuerTag = False
+                            End If
                             DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
 
                             LetzteZeit = .Rows(i).Item("startzeit")
@@ -243,7 +241,6 @@ Public Class Form1
                                     Tagessumme = TimeSpan.Zero
 
                                     NeuerTag = True
-
 
                                 End If
 
@@ -286,20 +283,16 @@ Public Class Form1
     End Sub
 
     Private Sub PrintDocument1_BeginPrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles PrintDocument1.BeginPrint
-
         PrintDocument1.OriginAtMargins = True
         PrintDocument1.DefaultPageSettings.Margins = New Drawing.Printing.Margins(20, 20, 20, 20)
         mRow = 0
         newpage = True
-
-
     End Sub
-
 
     ' https://stackoverflow.com/questions/41015287/how-to-print-datagridview-table-with-its-header-in-vb-net
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
 
-        ' sets it to show '...' for long text
+        ' Langen Text mit ... abschneiden
         Dim fmt As StringFormat = New StringFormat(StringFormatFlags.LineLimit)
         fmt.LineAlignment = StringAlignment.Center
         fmt.Trimming = StringTrimming.EllipsisCharacter
@@ -309,14 +302,11 @@ Public Class Form1
         Dim h As Int32 = 0
         Dim row As DataGridViewRow
 
-        ' print the header text for a new page
-        '   use a grey bg just like the control
+        '   Drucke Header
         If newpage Then
             row = DataGridView1.Rows(mRow)
             x = e.MarginBounds.Left
             For Each cell As DataGridViewCell In row.Cells
-                ' since we are printing the control's view,
-                ' skip invidible columns
                 If cell.Visible Then
 
                     If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
@@ -331,7 +321,6 @@ Public Class Form1
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
 
-                    ' reused in the data pront - should be a function
                     Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
                         Case DataGridViewContentAlignment.BottomRight,
                             DataGridViewContentAlignment.MiddleRight
@@ -353,7 +342,6 @@ Public Class Form1
             Next
 
             ' Lohnrechnung
-
             x += 20
             y = e.MarginBounds.Top + 20
 
@@ -385,19 +373,18 @@ Public Class Form1
         End If
         newpage = False
 
-        ' now print the data for each row
+        ' Drucke Datenreihen
         Dim thisNDX As Int32
         For thisNDX = mRow To DataGridView1.RowCount - 1
+
             ' no need to try to print the new row
             If DataGridView1.Rows(thisNDX).IsNewRow Then Exit For
-
             row = DataGridView1.Rows(thisNDX)
             h = 0
 
-            ' reset X for data
+            ' reset X um von links anzufangen
             x = e.MarginBounds.Left
 
-            ' print the data
             For Each cell As DataGridViewCell In row.Cells
                 If cell.Visible Then
                     If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
@@ -405,9 +392,6 @@ Public Class Form1
                     Else
                         rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
                     End If
-
-
-
 
                     Using br As New SolidBrush(cell.Style.BackColor)
                         e.Graphics.FillRectangle(br, rc)
@@ -448,14 +432,10 @@ Public Class Form1
             End If
         Next
 
-
-
-
-
     End Sub
 
     Private Sub EinstellungenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EinstellungenToolStripMenuItem.Click
-        FrmEinstellungen.Show()
+
     End Sub
 
     Friend Sub AktualisiereAbbrechnung()
@@ -463,7 +443,7 @@ Public Class Form1
         Dim lohnUeber As Double
         Dim lohnGes As Double
 
-        Label2.Text = "Lohn bis " & Format(My.Settings.geplStunden, "#0.00") & "h (" & FormatCurrency(My.Settings.stdLohn, 2) & "):"
+        Label2.Text = "Lohn bis " & Format(My.Settings.geplStunden, "#0.00") & "h (" & FormatCurrency(My.Settings.stdLohn, 2, TriState.True) & "):"
         Label3.Text = "Lohn über " & Format(My.Settings.geplStunden, "#0.00") & "h:"
 
         TBSumme.Text = Format(monatssumme.TotalHours, "#0.00")
@@ -478,13 +458,24 @@ Public Class Form1
 
         lohnGes = lohn + lohnUeber
 
-        TBLohn.Text = FormatCurrency(lohn, 2)
-        TBUeberStd.Text = FormatCurrency(lohnUeber, 2)
-        TBLohnGes.Text = FormatCurrency(lohnGes, 2)
+        TBLohn.Text = FormatCurrency(lohn, 2, TriState.True)
+        TBUeberStd.Text = FormatCurrency(lohnUeber, 2, TriState.True)
+        TBLohnGes.Text = FormatCurrency(lohnGes, 2, TriState.True)
     End Sub
 
     Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
-        TabelleEinlesen()
+        If My.Settings.letzteDB <> "" Then
+            TabelleEinlesen()
+            AktualisiereAbbrechnung()
+        End If
+    End Sub
+
+    Private Sub ResetToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ResetToolStripMenuItem.Click
+        My.Settings.Reset()
         AktualisiereAbbrechnung()
+    End Sub
+
+    Private Sub BearbeitenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BearbeitenToolStripMenuItem.Click
+        FrmEinstellungen.Show()
     End Sub
 End Class

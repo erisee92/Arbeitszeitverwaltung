@@ -51,6 +51,8 @@ Partial Class Form1
         Me.TBLohnGes = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.CBMonat = New System.Windows.Forms.ComboBox()
+        Me.ResetToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BearbeitenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
@@ -92,6 +94,7 @@ Partial Class Form1
         '
         'EinstellungenToolStripMenuItem
         '
+        Me.EinstellungenToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BearbeitenToolStripMenuItem, Me.ResetToolStripMenuItem})
         Me.EinstellungenToolStripMenuItem.Name = "EinstellungenToolStripMenuItem"
         Me.EinstellungenToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
         Me.EinstellungenToolStripMenuItem.Text = "&Einstellungen"
@@ -286,6 +289,18 @@ Partial Class Form1
         Me.CBMonat.Size = New System.Drawing.Size(121, 21)
         Me.CBMonat.TabIndex = 10
         '
+        'ResetToolStripMenuItem
+        '
+        Me.ResetToolStripMenuItem.Name = "ResetToolStripMenuItem"
+        Me.ResetToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ResetToolStripMenuItem.Text = "Reset"
+        '
+        'BearbeitenToolStripMenuItem
+        '
+        Me.BearbeitenToolStripMenuItem.Name = "BearbeitenToolStripMenuItem"
+        Me.BearbeitenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.BearbeitenToolStripMenuItem.Text = "Bearbeiten"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -336,4 +351,6 @@ Partial Class Form1
     Friend WithEvents TBLohnGes As TextBox
     Friend WithEvents Panel1 As Panel
     Friend WithEvents CBMonat As ComboBox
+    Friend WithEvents ResetToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BearbeitenToolStripMenuItem As ToolStripMenuItem
 End Class
