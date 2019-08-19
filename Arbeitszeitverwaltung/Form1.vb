@@ -168,19 +168,18 @@ Public Class Form1
                                 Tagessumme = duration
                             End If
 
+                            If NeuerTag = False Then
+                                Tagessumme += duration
+                            End If
+
                             If i < .Rows.Count - 1 Then
                                 If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
 
-                                    If NeuerTag = False Then
-                                        Tagessumme += duration
-                                    End If
+
                                     NeuerTag = False
                                     DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
-                                    If NeuerTag = False Then
-                                        Tagessumme += duration
-                                    End If
                                     DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
                                     monatssumme += Tagessumme
                                     Tagessumme = TimeSpan.Zero
@@ -190,9 +189,6 @@ Public Class Form1
                                 End If
 
                             Else
-                                If NeuerTag = False Then
-                                    Tagessumme += duration
-                                End If
                                 DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
                                 monatssumme += Tagessumme
                             End If
@@ -213,28 +209,19 @@ Public Class Form1
 
                             If NeuerTag = True Then
                                 Tagessumme = duration
+                            End If
 
-                                If aktFarbe.Equals(Background1) = True Then
-                                    aktFarbe = Background2
-                                Else
-                                    aktFarbe = Background1
-                                End If
+                            If NeuerTag = False Then
+                                Tagessumme += duration
                             End If
 
                             If i < .Rows.Count - 1 Then
                                 If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
 
-                                    If NeuerTag = False Then
-                                        Tagessumme += duration
-                                    End If
                                     NeuerTag = False
                                     DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
-
-                                    If NeuerTag = False Then
-                                        Tagessumme += duration
-                                    End If
 
                                     DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                                     monatssumme += Tagessumme
@@ -245,9 +232,6 @@ Public Class Form1
                                 End If
 
                             Else
-                                If NeuerTag = False Then
-                                    Tagessumme += duration
-                                End If
                                 DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                                 monatssumme += Tagessumme
                             End If
@@ -296,10 +280,11 @@ Public Class Form1
         Dim fmt As StringFormat = New StringFormat(StringFormatFlags.LineLimit)
         fmt.LineAlignment = StringAlignment.Center
         fmt.Trimming = StringTrimming.EllipsisCharacter
-        Dim y As Int32 = e.MarginBounds.Top
+
+        Dim y As Integer = e.MarginBounds.Top
         Dim rc As Rectangle
-        Dim x As Int32
-        Dim h As Int32 = 0
+        Dim x As Integer
+        Dim h As Integer = 0
         Dim row As DataGridViewRow
 
         '   Drucke Header
@@ -321,21 +306,7 @@ Public Class Form1
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
 
-                    Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
-                        Case DataGridViewContentAlignment.BottomRight,
-                            DataGridViewContentAlignment.MiddleRight
-                            fmt.Alignment = StringAlignment.Far
-                            rc.Offset(-1, 0)
-                        Case DataGridViewContentAlignment.BottomCenter,
-                        DataGridViewContentAlignment.MiddleCenter
-                            fmt.Alignment = StringAlignment.Center
-                        Case Else
-                            fmt.Alignment = StringAlignment.Near
-                            rc.Offset(2, 0)
-                    End Select
-
-                    e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText,
-                                            DataGridView1.Font, Brushes.White, rc, fmt)
+                    e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText, DataGridView1.Font, Brushes.White, rc, fmt)
                     x += rc.Width
                     h = Math.Max(h, rc.Height)
                 End If
@@ -374,11 +345,9 @@ Public Class Form1
         newpage = False
 
         ' Drucke Datenreihen
-        Dim thisNDX As Int32
+        Dim thisNDX As Integer
         For thisNDX = mRow To DataGridView1.RowCount - 1
 
-            ' no need to try to print the new row
-            If DataGridView1.Rows(thisNDX).IsNewRow Then Exit For
             row = DataGridView1.Rows(thisNDX)
             h = 0
 
@@ -399,21 +368,7 @@ Public Class Form1
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
 
-                    Select Case DataGridView1.Columns(cell.ColumnIndex).DefaultCellStyle.Alignment
-                        Case DataGridViewContentAlignment.BottomRight,
-                             DataGridViewContentAlignment.MiddleRight
-                            fmt.Alignment = StringAlignment.Far
-                            rc.Offset(-1, 0)
-                        Case DataGridViewContentAlignment.BottomCenter,
-                            DataGridViewContentAlignment.MiddleCenter
-                            fmt.Alignment = StringAlignment.Center
-                        Case Else
-                            fmt.Alignment = StringAlignment.Near
-                            rc.Offset(2, 0)
-                    End Select
-
-                    e.Graphics.DrawString(cell.FormattedValue.ToString(),
-                                          DataGridView1.Font, Brushes.Black, rc, fmt)
+                    e.Graphics.DrawString(cell.FormattedValue.ToString(), DataGridView1.Font, Brushes.Black, rc, fmt)
 
                     x += rc.Width
                     h = Math.Max(h, rc.Height)
@@ -426,7 +381,6 @@ Public Class Form1
 
             If y + h > e.MarginBounds.Bottom Then
                 e.HasMorePages = True
-                ' mRow -= 1   causes last row to rePrint on next page
                 newpage = True
                 Return
             End If
