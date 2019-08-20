@@ -20,9 +20,16 @@ Public Class Form1
         If My.Settings.letzteDB <> "" Then
             dbDateiPfad = My.Settings.letzteDB
             BtnAdd.Enabled = True
+            BtnDruck.Enabled = True
+            CBJahr.Enabled = True
+            CBMonat.Enabled = True
         End If
 
         CBMonat.SelectedIndex = Date.Today.Month - 1
+        For i = Date.Today.Year - 10 To Date.Today.Year
+            CBJahr.Items.Add(i)
+        Next
+        CBJahr.SelectedIndex = 10
 
     End Sub
 
@@ -34,8 +41,11 @@ Public Class Form1
         dbDateiPfad = OpenFileDialog1.FileName
         My.Settings.letzteDB = dbDateiPfad
         TabelleEinlesen()
-        AktualisiereAbbrechnung()
+        AktualisiereAbrechnung()
         BtnAdd.Enabled = True
+        BtnDruck.Enabled = True
+        CBJahr.Enabled = True
+        CBMonat.Enabled = True
     End Sub
 
     Private Sub NeueDatenbankToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles NeueDatenbankToolStripMenuItem.Click
@@ -107,18 +117,27 @@ Public Class Form1
         Dim cmdEintraege As SQLiteCommand
         con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
         cmdEintraege = con.CreateCommand()
+
+        ' Bekommen ausgewählten und nächsten monat
         Dim monat As String = ""
         Dim nmonat As String = ""
+        Dim jahr As String = ""
+        Dim njahr As String = ""
 
-        If (CBMonat.SelectedIndex + 1) < 10 Then
-            monat = "0" & (CBMonat.SelectedIndex + 1)
-            nmonat = "0" & (CBMonat.SelectedIndex + 2)
+        monat = (CBMonat.SelectedIndex + 1).ToString("D2")
+        nmonat = (CBMonat.SelectedIndex + 2).ToString("D2")
+
+
+        jahr = CBJahr.SelectedItem
+        If CBMonat.SelectedIndex >= 11 Then
+            njahr = CBJahr.SelectedItem + 1
+            nmonat = "01"
         Else
-            monat = "" & (CBMonat.SelectedIndex + 1)
-            nmonat = "" & (CBMonat.SelectedIndex + 2)
+            njahr = jahr
         End If
 
-        Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('2019-" & monat & "-01') AND date(datum) < date('2019-" & nmonat & "-01')"
+
+        Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('" & jahr & "-" & monat & "-01') AND date(datum) < date('" & njahr & "-" & nmonat & "-01')"
 
         Dim LetzteZeit As Date
         Dim Tagessumme As TimeSpan = TimeSpan.Zero
@@ -287,6 +306,10 @@ Public Class Form1
         Dim h As Integer = 0
         Dim row As DataGridViewRow
 
+        ' Drucke Überschrift
+
+
+
         '   Drucke Header
         If newpage Then
             row = DataGridView1.Rows(mRow)
@@ -388,11 +411,8 @@ Public Class Form1
 
     End Sub
 
-    Private Sub EinstellungenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EinstellungenToolStripMenuItem.Click
 
-    End Sub
-
-    Friend Sub AktualisiereAbbrechnung()
+    Friend Sub AktualisiereAbrechnung()
         Dim lohn As Double
         Dim lohnUeber As Double
         Dim lohnGes As Double
@@ -420,16 +440,32 @@ Public Class Form1
     Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
         If My.Settings.letzteDB <> "" Then
             TabelleEinlesen()
-            AktualisiereAbbrechnung()
+            AktualisiereAbrechnung()
+        End If
+    End Sub
+    Private Sub CBJahr_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBJahr.SelectedIndexChanged
+        If My.Settings.letzteDB <> "" Then
+            TabelleEinlesen()
+            AktualisiereAbrechnung()
         End If
     End Sub
 
+
     Private Sub ResetToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ResetToolStripMenuItem.Click
         My.Settings.Reset()
-        AktualisiereAbbrechnung()
+        DataGridView1.Rows.Clear()
+        monatssumme = TimeSpan.Zero
+        BtnAdd.Enabled = False
+        BtnDruck.Enabled = False
+        CBJahr.Enabled = False
+        CBMonat.Enabled = False
+        AktualisiereAbrechnung()
+
     End Sub
 
     Private Sub BearbeitenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BearbeitenToolStripMenuItem.Click
         FrmEinstellungen.Show()
     End Sub
+
+
 End Class

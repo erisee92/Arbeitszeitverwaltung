@@ -29,6 +29,8 @@ Partial Class Form1
         Me.DatenbankÖffnenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BeendenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EinstellungenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BearbeitenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ResetToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
@@ -50,9 +52,8 @@ Partial Class Form1
         Me.TBUeberStd = New System.Windows.Forms.TextBox()
         Me.TBLohnGes = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.CBJahr = New System.Windows.Forms.ComboBox()
         Me.CBMonat = New System.Windows.Forms.ComboBox()
-        Me.ResetToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.BearbeitenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
@@ -98,6 +99,18 @@ Partial Class Form1
         Me.EinstellungenToolStripMenuItem.Name = "EinstellungenToolStripMenuItem"
         Me.EinstellungenToolStripMenuItem.Size = New System.Drawing.Size(90, 20)
         Me.EinstellungenToolStripMenuItem.Text = "&Einstellungen"
+        '
+        'BearbeitenToolStripMenuItem
+        '
+        Me.BearbeitenToolStripMenuItem.Name = "BearbeitenToolStripMenuItem"
+        Me.BearbeitenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.BearbeitenToolStripMenuItem.Text = "Bearbeiten"
+        '
+        'ResetToolStripMenuItem
+        '
+        Me.ResetToolStripMenuItem.Name = "ResetToolStripMenuItem"
+        Me.ResetToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ResetToolStripMenuItem.Text = "Reset"
         '
         'OpenFileDialog1
         '
@@ -183,6 +196,7 @@ Partial Class Form1
         '
         'BtnDruck
         '
+        Me.BtnDruck.Enabled = False
         Me.BtnDruck.Location = New System.Drawing.Point(46, 51)
         Me.BtnDruck.Name = "BtnDruck"
         Me.BtnDruck.Size = New System.Drawing.Size(111, 41)
@@ -263,6 +277,7 @@ Partial Class Form1
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.CBJahr)
         Me.Panel1.Controls.Add(Me.CBMonat)
         Me.Panel1.Controls.Add(Me.TBLohnGes)
         Me.Panel1.Controls.Add(Me.TBUeberStd)
@@ -280,26 +295,24 @@ Partial Class Form1
         Me.Panel1.Size = New System.Drawing.Size(380, 426)
         Me.Panel1.TabIndex = 9
         '
+        'CBJahr
+        '
+        Me.CBJahr.Enabled = False
+        Me.CBJahr.FormattingEnabled = True
+        Me.CBJahr.Location = New System.Drawing.Point(193, 35)
+        Me.CBJahr.Name = "CBJahr"
+        Me.CBJahr.Size = New System.Drawing.Size(121, 21)
+        Me.CBJahr.TabIndex = 11
+        '
         'CBMonat
         '
+        Me.CBMonat.Enabled = False
         Me.CBMonat.FormattingEnabled = True
         Me.CBMonat.Items.AddRange(New Object() {"Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"})
-        Me.CBMonat.Location = New System.Drawing.Point(193, 36)
+        Me.CBMonat.Location = New System.Drawing.Point(193, 62)
         Me.CBMonat.Name = "CBMonat"
         Me.CBMonat.Size = New System.Drawing.Size(121, 21)
         Me.CBMonat.TabIndex = 10
-        '
-        'ResetToolStripMenuItem
-        '
-        Me.ResetToolStripMenuItem.Name = "ResetToolStripMenuItem"
-        Me.ResetToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.ResetToolStripMenuItem.Text = "Reset"
-        '
-        'BearbeitenToolStripMenuItem
-        '
-        Me.BearbeitenToolStripMenuItem.Name = "BearbeitenToolStripMenuItem"
-        Me.BearbeitenToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.BearbeitenToolStripMenuItem.Text = "Bearbeiten"
         '
         'Form1
         '
@@ -353,4 +366,5 @@ Partial Class Form1
     Friend WithEvents CBMonat As ComboBox
     Friend WithEvents ResetToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BearbeitenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CBJahr As ComboBox
 End Class

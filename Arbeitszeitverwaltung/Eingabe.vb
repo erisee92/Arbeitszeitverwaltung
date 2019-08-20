@@ -98,7 +98,7 @@ Public Class Eingabe
             con.Close()
 
             Form1.TabelleEinlesen()
-            Form1.AktualisiereAbbrechnung()
+            Form1.AktualisiereAbrechnung()
 
         Catch ex As Exception
             MessageBox.Show(ex.Message)

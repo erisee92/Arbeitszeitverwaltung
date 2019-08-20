@@ -29,12 +29,14 @@ Partial Class FrmEinstellungen
         Me.TBStdLohn = New System.Windows.Forms.TextBox()
         Me.BtnSpeichern = New System.Windows.Forms.Button()
         Me.BtnAbbrechen = New System.Windows.Forms.Button()
+        Me.TBMitarbeiter = New System.Windows.Forms.TextBox()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(31, 41)
+        Me.Label1.Location = New System.Drawing.Point(37, 51)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(98, 13)
         Me.Label1.TabIndex = 0
@@ -43,7 +45,7 @@ Partial Class FrmEinstellungen
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(31, 68)
+        Me.Label2.Location = New System.Drawing.Point(32, 78)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(103, 13)
         Me.Label2.TabIndex = 1
@@ -51,21 +53,21 @@ Partial Class FrmEinstellungen
         '
         'TBgeplStd
         '
-        Me.TBgeplStd.Location = New System.Drawing.Point(158, 34)
+        Me.TBgeplStd.Location = New System.Drawing.Point(158, 47)
         Me.TBgeplStd.Name = "TBgeplStd"
         Me.TBgeplStd.Size = New System.Drawing.Size(100, 20)
         Me.TBgeplStd.TabIndex = 2
         '
         'TBStdLohn
         '
-        Me.TBStdLohn.Location = New System.Drawing.Point(158, 61)
+        Me.TBStdLohn.Location = New System.Drawing.Point(158, 73)
         Me.TBStdLohn.Name = "TBStdLohn"
         Me.TBStdLohn.Size = New System.Drawing.Size(100, 20)
         Me.TBStdLohn.TabIndex = 3
         '
         'BtnSpeichern
         '
-        Me.BtnSpeichern.Location = New System.Drawing.Point(44, 105)
+        Me.BtnSpeichern.Location = New System.Drawing.Point(43, 104)
         Me.BtnSpeichern.Name = "BtnSpeichern"
         Me.BtnSpeichern.Size = New System.Drawing.Size(75, 23)
         Me.BtnSpeichern.TabIndex = 4
@@ -74,18 +76,36 @@ Partial Class FrmEinstellungen
         '
         'BtnAbbrechen
         '
-        Me.BtnAbbrechen.Location = New System.Drawing.Point(168, 105)
+        Me.BtnAbbrechen.Location = New System.Drawing.Point(167, 102)
         Me.BtnAbbrechen.Name = "BtnAbbrechen"
         Me.BtnAbbrechen.Size = New System.Drawing.Size(75, 23)
         Me.BtnAbbrechen.TabIndex = 5
         Me.BtnAbbrechen.Text = "Abbrechen"
         Me.BtnAbbrechen.UseVisualStyleBackColor = True
         '
+        'TBMitarbeiter
+        '
+        Me.TBMitarbeiter.Location = New System.Drawing.Point(158, 21)
+        Me.TBMitarbeiter.Name = "TBMitarbeiter"
+        Me.TBMitarbeiter.Size = New System.Drawing.Size(100, 20)
+        Me.TBMitarbeiter.TabIndex = 7
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(53, 28)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(82, 13)
+        Me.Label3.TabIndex = 6
+        Me.Label3.Text = "Mitarbeitername"
+        '
         'FrmEinstellungen
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(303, 162)
+        Me.ClientSize = New System.Drawing.Size(295, 141)
+        Me.Controls.Add(Me.TBMitarbeiter)
+        Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.BtnAbbrechen)
         Me.Controls.Add(Me.BtnSpeichern)
         Me.Controls.Add(Me.TBStdLohn)
@@ -106,4 +126,6 @@ Partial Class FrmEinstellungen
     Friend WithEvents TBStdLohn As TextBox
     Friend WithEvents BtnSpeichern As Button
     Friend WithEvents BtnAbbrechen As Button
+    Friend WithEvents TBMitarbeiter As TextBox
+    Friend WithEvents Label3 As Label
 End Class
