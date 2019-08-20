@@ -307,8 +307,17 @@ Public Class Form1
         Dim row As DataGridViewRow
 
         ' Drucke Überschrift
+        Dim Schrift As New Font(FontFamily.GenericSansSerif, 14.0)
+        x = e.MarginBounds.Left
 
+        rc = New Rectangle(x, y + 5, PrintDocument1.DefaultPageSettings.PrintableArea.Width, 18)
+        Dim sf As New StringFormat
+        sf.Alignment = StringAlignment.Center
+        sf.LineAlignment = StringAlignment.Center
 
+        e.Graphics.DrawString(My.Settings.mitarbeiter & ", " & CBMonat.SelectedItem & " " & CBJahr.SelectedItem, Schrift, Brushes.Black, rc, sf)
+
+        y += 36
 
         '   Drucke Header
         If newpage Then
@@ -337,7 +346,7 @@ Public Class Form1
 
             ' Lohnrechnung
             x += 20
-            y = e.MarginBounds.Top + 20
+            y = e.MarginBounds.Top + h + 36
 
             e.Graphics.DrawString(Label1.Text, Label1.Font, Brushes.Black, x, y)
             x += 150
@@ -362,7 +371,7 @@ Public Class Form1
             e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
             y += Label1.Height + 5
 
-            y = h + e.MarginBounds.Top
+            y = h + e.MarginBounds.Top + 36
 
         End If
         newpage = False
