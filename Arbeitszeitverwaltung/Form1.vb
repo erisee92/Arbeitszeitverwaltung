@@ -14,8 +14,8 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        OpenFileDialog1.InitialDirectory = My.Application.Info.DirectoryPath
-        SaveFileDialog1.InitialDirectory = My.Application.Info.DirectoryPath
+        OpenFileDialog1.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        SaveFileDialog1.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
 
         If My.Settings.letzteDB <> "" Then
             dbDateiPfad = My.Settings.letzteDB
