@@ -94,6 +94,11 @@ Public Class Form1
         My.Settings.letzteDB = SaveFileDialog1.FileName
         dbDateiPfad = SaveFileDialog1.FileName
         TabelleEinlesen()
+        AktualisiereAbrechnung()
+        BtnAdd.Enabled = True
+        BtnDruck.Enabled = True
+        CBJahr.Enabled = True
+        CBMonat.Enabled = True
 
         MessageBox.Show("Datenbank gespeichert", "Speichern Erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
@@ -310,7 +315,7 @@ Public Class Form1
         Dim Schrift As New Font(FontFamily.GenericSansSerif, 14.0)
         x = e.MarginBounds.Left
 
-        rc = New Rectangle(x, y + 5, PrintDocument1.DefaultPageSettings.PrintableArea.Width, 18)
+        rc = New Rectangle(x, y + 5, PrintDocument1.DefaultPageSettings.PrintableArea.Width, 25)
         Dim sf As New StringFormat
         sf.Alignment = StringAlignment.Center
         sf.LineAlignment = StringAlignment.Center
