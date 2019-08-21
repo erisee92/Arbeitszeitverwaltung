@@ -1,7 +1,10 @@
 ﻿Imports System.Data.SQLite
 
 Public Class Eingabe
+
+
     Private Sub Eingabe_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+
         Dim cmd As SQLiteCommand
         Dim con As New SQLiteConnection()
         con.ConnectionString = "Data Source=" & Form1.dbDateiPfad & ";"
@@ -25,6 +28,34 @@ Public Class Eingabe
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+
+        BtnHinzu.Text = "Hinzufügen"
+
+        If Form1.neu = False Then
+
+            BtnHinzu.Text = "Ändern"
+
+            With Form1.DataGridView1.SelectedRows.Item(0)
+                DTPDatum.Value = .Cells(1).Value
+                TBStrasse.Text = .Cells(2).Value
+                DTPStart.Checked = False
+                DTPEnde.Checked = False
+
+                If .Cells(3).Value <> " " Then
+                    Dim start As Date = .Cells(3).Value
+                    DTPStart.Checked = True
+                    DTPStart.Text = start.ToShortTimeString()
+                End If
+
+                If .Cells(4).Value <> " " Then
+                    Dim ende As Date = .Cells(4).Value
+                    DTPEnde.Checked = True
+                    DTPEnde.Text = ende.ToShortTimeString()
+                End If
+            End With
+
+        End If
+
     End Sub
 
 
@@ -74,22 +105,50 @@ Public Class Eingabe
                 SId = cmd.ExecuteScalar
             End If
 
-            If DTPStart.Checked = True And DTPEnde.Checked = True Then
-                Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit, endzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "', '" & endZeit & "');"
-                DTPEnde.Checked = False
+            If Form1.neu = True Then
 
-            ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
-                Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "');"
-                DTPStart.Checked = False
+                If DTPStart.Checked = True And DTPEnde.Checked = True Then
+                    Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit, endzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "', '" & endZeit & "');"
+                    DTPEnde.Checked = False
 
-            ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
-                Querry = "INSERT INTO Zeiten(datum, fkStrasse, endzeit) VALUES ('" & datum & "', " & SId & ", '" & endZeit & "');"
-                DTPStart.Checked = True
-                DTPEnde.Checked = False
+                ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
+                    Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "');"
+                    DTPStart.Checked = False
+
+                ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
+                    Querry = "INSERT INTO Zeiten(datum, fkStrasse, endzeit) VALUES ('" & datum & "', " & SId & ", '" & endZeit & "');"
+                    DTPStart.Checked = True
+                    DTPEnde.Checked = False
+
+                Else
+                    Querry = "INSERT INTO Zeiten(datum, fkStrasse ) VALUES ('" & datum & "', " & SId & ");"
+                End If
 
             Else
-                Querry = "INSERT INTO Zeiten(datum, fkStrasse ) VALUES ('" & datum & "', " & SId & ");"
+
+                Dim ZId = Form1.DataGridView1.SelectedRows.Item(0).Cells(0).Value
+
+
+                If DTPStart.Checked = True And DTPEnde.Checked = True Then
+                    Querry = "UPDATE Zeiten SET datum='" & datum & "', fkStrasse='" & SId & "', startzeit='" & startZeit & "', endzeit='" & endZeit & "' WHERE ZId='" & ZId & "';"
+                    DTPEnde.Checked = False
+
+                ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
+
+                    Querry = "UPDATE Zeiten SET datum='" & datum & "', fkStrasse='" & SId & "', startzeit='" & startZeit & "' WHERE ZId='" & ZId & "';"
+                    DTPStart.Checked = False
+
+                ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
+                    Querry = "UPDATE Zeiten SET datum='" & datum & "', fkStrasse='" & SId & "', endzeit='" & endZeit & "' WHERE ZId='" & ZId & "';"
+                    DTPStart.Checked = True
+                    DTPEnde.Checked = False
+
+                Else
+                    Querry = "UPDATE Zeiten SET datum='" & datum & "', fkStrasse='" & SId & "' WHERE ZId='" & ZId & "';"
+                End If
+
             End If
+
 
             cmd.CommandText = Querry
 
@@ -100,9 +159,18 @@ Public Class Eingabe
             Form1.TabelleEinlesen()
             Form1.AktualisiereAbrechnung()
 
+            TBStrasse.Text = ""
+
+
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+
+        If Form1.neu = False Then
+            Me.Hide()
+            Form1.Show()
+        End If
+
     End Sub
 
 End Class

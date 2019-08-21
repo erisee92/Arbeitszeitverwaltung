@@ -34,12 +34,6 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
-        Me.SpTag = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.SpStrasse = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.SpStart = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.SpEnde = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.SpDauer = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.SpDauerTag = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.BtnAdd = New System.Windows.Forms.Button()
         Me.BtnDruck = New System.Windows.Forms.Button()
         Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument()
@@ -54,6 +48,13 @@ Partial Class Form1
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.CBJahr = New System.Windows.Forms.ComboBox()
         Me.CBMonat = New System.Windows.Forms.ComboBox()
+        Me.ColID = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpTag = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpStrasse = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpStart = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpEnde = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpDauer = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.SpDauerTag = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.MenuStrip1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
@@ -134,55 +135,14 @@ Partial Class Form1
         Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.DataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.SpTag, Me.SpStrasse, Me.SpStart, Me.SpEnde, Me.SpDauer, Me.SpDauerTag})
+        Me.DataGridView1.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.ColID, Me.SpTag, Me.SpStrasse, Me.SpStart, Me.SpEnde, Me.SpDauer, Me.SpDauerTag})
         Me.DataGridView1.Location = New System.Drawing.Point(0, 24)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.RowHeadersVisible = False
+        Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.DataGridView1.Size = New System.Drawing.Size(414, 426)
         Me.DataGridView1.TabIndex = 1
-        '
-        'SpTag
-        '
-        Me.SpTag.HeaderText = "Tag"
-        Me.SpTag.Name = "SpTag"
-        Me.SpTag.ReadOnly = True
-        Me.SpTag.Width = 51
-        '
-        'SpStrasse
-        '
-        Me.SpStrasse.HeaderText = "Straße"
-        Me.SpStrasse.Name = "SpStrasse"
-        Me.SpStrasse.ReadOnly = True
-        Me.SpStrasse.Width = 63
-        '
-        'SpStart
-        '
-        Me.SpStart.HeaderText = "Start"
-        Me.SpStart.Name = "SpStart"
-        Me.SpStart.ReadOnly = True
-        Me.SpStart.Width = 54
-        '
-        'SpEnde
-        '
-        Me.SpEnde.HeaderText = "Ende"
-        Me.SpEnde.Name = "SpEnde"
-        Me.SpEnde.ReadOnly = True
-        Me.SpEnde.Width = 57
-        '
-        'SpDauer
-        '
-        Me.SpDauer.HeaderText = "Dauer"
-        Me.SpDauer.Name = "SpDauer"
-        Me.SpDauer.ReadOnly = True
-        Me.SpDauer.Width = 61
-        '
-        'SpDauerTag
-        '
-        Me.SpDauerTag.HeaderText = "Summe Tag"
-        Me.SpDauerTag.Name = "SpDauerTag"
-        Me.SpDauerTag.ReadOnly = True
-        Me.SpDauerTag.Width = 89
         '
         'BtnAdd
         '
@@ -314,6 +274,62 @@ Partial Class Form1
         Me.CBMonat.Size = New System.Drawing.Size(121, 21)
         Me.CBMonat.TabIndex = 10
         '
+        'ColID
+        '
+        Me.ColID.HeaderText = "ID"
+        Me.ColID.Name = "ColID"
+        Me.ColID.ReadOnly = True
+        Me.ColID.Visible = False
+        Me.ColID.Width = 24
+        '
+        'SpTag
+        '
+        Me.SpTag.HeaderText = "Tag"
+        Me.SpTag.Name = "SpTag"
+        Me.SpTag.ReadOnly = True
+        Me.SpTag.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpTag.Width = 32
+        '
+        'SpStrasse
+        '
+        Me.SpStrasse.HeaderText = "Straße"
+        Me.SpStrasse.Name = "SpStrasse"
+        Me.SpStrasse.ReadOnly = True
+        Me.SpStrasse.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpStrasse.Width = 44
+        '
+        'SpStart
+        '
+        Me.SpStart.HeaderText = "Start"
+        Me.SpStart.Name = "SpStart"
+        Me.SpStart.ReadOnly = True
+        Me.SpStart.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpStart.Width = 35
+        '
+        'SpEnde
+        '
+        Me.SpEnde.HeaderText = "Ende"
+        Me.SpEnde.Name = "SpEnde"
+        Me.SpEnde.ReadOnly = True
+        Me.SpEnde.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpEnde.Width = 38
+        '
+        'SpDauer
+        '
+        Me.SpDauer.HeaderText = "Dauer"
+        Me.SpDauer.Name = "SpDauer"
+        Me.SpDauer.ReadOnly = True
+        Me.SpDauer.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpDauer.Width = 42
+        '
+        'SpDauerTag
+        '
+        Me.SpDauerTag.HeaderText = "Summe Tag"
+        Me.SpDauerTag.Name = "SpDauerTag"
+        Me.SpDauerTag.ReadOnly = True
+        Me.SpDauerTag.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.SpDauerTag.Width = 70
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -345,12 +361,6 @@ Partial Class Form1
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
     Friend WithEvents DataGridView1 As DataGridView
     Friend WithEvents BtnAdd As Button
-    Friend WithEvents SpTag As DataGridViewTextBoxColumn
-    Friend WithEvents SpStrasse As DataGridViewTextBoxColumn
-    Friend WithEvents SpStart As DataGridViewTextBoxColumn
-    Friend WithEvents SpEnde As DataGridViewTextBoxColumn
-    Friend WithEvents SpDauer As DataGridViewTextBoxColumn
-    Friend WithEvents SpDauerTag As DataGridViewTextBoxColumn
     Friend WithEvents BtnDruck As Button
     Friend WithEvents PrintDocument1 As Printing.PrintDocument
     Friend WithEvents EinstellungenToolStripMenuItem As ToolStripMenuItem
@@ -367,4 +377,11 @@ Partial Class Form1
     Friend WithEvents ResetToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BearbeitenToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CBJahr As ComboBox
+    Friend WithEvents ColID As DataGridViewTextBoxColumn
+    Friend WithEvents SpTag As DataGridViewTextBoxColumn
+    Friend WithEvents SpStrasse As DataGridViewTextBoxColumn
+    Friend WithEvents SpStart As DataGridViewTextBoxColumn
+    Friend WithEvents SpEnde As DataGridViewTextBoxColumn
+    Friend WithEvents SpDauer As DataGridViewTextBoxColumn
+    Friend WithEvents SpDauerTag As DataGridViewTextBoxColumn
 End Class

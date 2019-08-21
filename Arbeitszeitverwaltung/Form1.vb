@@ -7,6 +7,8 @@ Public Class Form1
     Friend dbDateiPfad As String
     Dim ds As New DataSet
 
+    Friend neu As Boolean = True
+
     Private mRow As Integer = 0
     Private newpage As Boolean = True
 
@@ -104,6 +106,7 @@ Public Class Form1
     End Sub
 
     Private Sub BtnAdd_Click(sender As Object, e As EventArgs) Handles BtnAdd.Click
+        neu = True
         Eingabe.ShowDialog()
     End Sub
 
@@ -201,10 +204,10 @@ Public Class Form1
 
 
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
-                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
                                     monatssumme += Tagessumme
                                     Tagessumme = TimeSpan.Zero
 
@@ -213,7 +216,7 @@ Public Class Form1
                                 End If
 
                             Else
-                                DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
                                 monatssumme += Tagessumme
                             End If
 
@@ -221,7 +224,7 @@ Public Class Form1
                             If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
                                 NeuerTag = False
                             End If
-                            DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
+                            DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
 
                             LetzteZeit = .Rows(i).Item("startzeit")
 
@@ -243,11 +246,11 @@ Public Class Form1
                                 If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
 
                                     NeuerTag = False
-                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
 
                                 Else
 
-                                    DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                                     monatssumme += Tagessumme
                                     Tagessumme = TimeSpan.Zero
 
@@ -256,12 +259,12 @@ Public Class Form1
                                 End If
 
                             Else
-                                DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
                                 monatssumme += Tagessumme
                             End If
 
                         Case 3
-                            DataGridView1.Rows.Add({datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
+                            DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
 
                     End Select
 
@@ -481,5 +484,8 @@ Public Class Form1
         FrmEinstellungen.Show()
     End Sub
 
-
+    Private Sub DataGridView1_CellContentDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentDoubleClick
+        neu = False
+        Eingabe.ShowDialog()
+    End Sub
 End Class
