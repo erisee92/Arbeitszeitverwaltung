@@ -334,11 +334,7 @@ Public Class Form1
             For Each cell As DataGridViewCell In row.Cells
                 If cell.Visible Then
 
-                    If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
-                        rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
-                    Else
-                        rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
-                    End If
+                    rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
 
                     Using br As New SolidBrush(Color.FromArgb(&HFF0069C0))
                         e.Graphics.FillRectangle(br, rc)
@@ -346,7 +342,7 @@ Public Class Form1
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
 
-                    e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText, DataGridView1.Font, Brushes.White, rc, fmt)
+                    e.Graphics.DrawString(DataGridView1.Columns(cell.ColumnIndex).HeaderText, DataGridView1.Font, Brushes.White, rc, sf)
                     x += rc.Width
                     h = Math.Max(h, rc.Height)
                 End If
@@ -396,11 +392,7 @@ Public Class Form1
 
             For Each cell As DataGridViewCell In row.Cells
                 If cell.Visible Then
-                    If cell.ColumnIndex = 0 Or cell.ColumnIndex = 1 Then
-                        rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
-                    Else
-                        rc = New Rectangle(x, y, cell.Size.Width, cell.Size.Height)
-                    End If
+                    rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
 
                     Using br As New SolidBrush(cell.Style.BackColor)
                         e.Graphics.FillRectangle(br, rc)

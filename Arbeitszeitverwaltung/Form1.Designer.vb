@@ -285,38 +285,43 @@ Partial Class Form1
         'SpTag
         '
         Me.SpTag.HeaderText = "Tag"
+        Me.SpTag.MinimumWidth = 50
         Me.SpTag.Name = "SpTag"
         Me.SpTag.ReadOnly = True
         Me.SpTag.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.SpTag.Width = 32
+        Me.SpTag.Width = 50
         '
         'SpStrasse
         '
         Me.SpStrasse.HeaderText = "Straße"
+        Me.SpStrasse.MinimumWidth = 150
         Me.SpStrasse.Name = "SpStrasse"
         Me.SpStrasse.ReadOnly = True
         Me.SpStrasse.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.SpStrasse.Width = 44
+        Me.SpStrasse.Width = 150
         '
         'SpStart
         '
         Me.SpStart.HeaderText = "Start"
+        Me.SpStart.MinimumWidth = 40
         Me.SpStart.Name = "SpStart"
         Me.SpStart.ReadOnly = True
         Me.SpStart.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.SpStart.Width = 35
+        Me.SpStart.Width = 40
         '
         'SpEnde
         '
         Me.SpEnde.HeaderText = "Ende"
+        Me.SpEnde.MinimumWidth = 40
         Me.SpEnde.Name = "SpEnde"
         Me.SpEnde.ReadOnly = True
         Me.SpEnde.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.SpEnde.Width = 38
+        Me.SpEnde.Width = 40
         '
         'SpDauer
         '
         Me.SpDauer.HeaderText = "Dauer"
+        Me.SpDauer.MinimumWidth = 40
         Me.SpDauer.Name = "SpDauer"
         Me.SpDauer.ReadOnly = True
         Me.SpDauer.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
@@ -325,6 +330,7 @@ Partial Class Form1
         'SpDauerTag
         '
         Me.SpDauerTag.HeaderText = "Summe Tag"
+        Me.SpDauerTag.MinimumWidth = 40
         Me.SpDauerTag.Name = "SpDauerTag"
         Me.SpDauerTag.ReadOnly = True
         Me.SpDauerTag.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
