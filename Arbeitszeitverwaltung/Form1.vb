@@ -373,8 +373,8 @@ Public Class Form1
             Dim Background2 As Color = Color.FromArgb(&HFFC3FDFF)
             Dim aktFarbe As Color = Background1
 
-            'Try
-            con.Open()
+            Try
+                con.Open()
 
                 Dim da = New SQLiteDataAdapter(Querry, con)
                 da.Fill(ds)
@@ -421,7 +421,6 @@ Public Class Form1
                                 If i < .Rows.Count - 1 Then
                                     If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
 
-
                                         NeuerTag = False
                                         DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
 
@@ -439,14 +438,15 @@ Public Class Form1
                                     monatssumme += Tagessumme
                                 End If
 
-                        Case 1
-                            ' TODO prüfen ob mehr als eine Zeile in der Tabelle
-                            If i >= .Rows.Count - 1 Then
-                                NeuerTag = False
-                            ElseIf .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
-                                NeuerTag = False
-                            End If
-                            DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
+                            Case 1
+
+                                ' Abfangen ob letzte Zeile
+                                If i >= .Rows.Count - 1 Then
+                                    NeuerTag = False
+                                ElseIf .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
+                                    NeuerTag = False
+                                End If
+                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
 
                                 LetzteZeit = .Rows(i).Item("startzeit")
 
@@ -498,9 +498,9 @@ Public Class Form1
 
                 con.Close()
 
-            'Catch ex As Exception
-            'MessageBox.Show(ex.Message)
-            'End Try
+            Catch ex As Exception
+                MessageBox.Show(ex.Message)
+            End Try
         End Using
     End Sub
 End Class
