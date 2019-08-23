@@ -90,8 +90,8 @@ Public Class Eingabe
 
         Dim SId
 
-        Try
-            con.Open()
+        'Try
+        con.Open()
 
             SId = cmd.ExecuteScalar
 
@@ -162,9 +162,9 @@ Public Class Eingabe
             TBStrasse.Text = ""
 
 
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
+        'Catch ex As Exception
+        '    MessageBox.Show(ex.Message)
+        'End Try
 
         If Form1.neuerEintrag = False Then
             Me.Hide()
