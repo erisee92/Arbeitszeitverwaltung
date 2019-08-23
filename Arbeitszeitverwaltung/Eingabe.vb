@@ -31,7 +31,7 @@ Public Class Eingabe
 
         BtnHinzu.Text = "Hinzufügen"
 
-        If Form1.neu = False Then
+        If Form1.neuerEintrag = False Then
 
             BtnHinzu.Text = "Ändern"
 
@@ -105,7 +105,7 @@ Public Class Eingabe
                 SId = cmd.ExecuteScalar
             End If
 
-            If Form1.neu = True Then
+            If Form1.neuerEintrag = True Then
 
                 If DTPStart.Checked = True And DTPEnde.Checked = True Then
                     Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit, endzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "', '" & endZeit & "');"
@@ -166,7 +166,7 @@ Public Class Eingabe
             MessageBox.Show(ex.Message)
         End Try
 
-        If Form1.neu = False Then
+        If Form1.neuerEintrag = False Then
             Me.Hide()
             Form1.Show()
         End If

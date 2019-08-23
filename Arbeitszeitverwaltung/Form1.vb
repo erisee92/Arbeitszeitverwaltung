@@ -7,10 +7,11 @@ Public Class Form1
     Friend dbDateiPfad As String
     Dim ds As New DataSet
 
-    Friend neu As Boolean = True
+    'Neuer Eintrag oder bearbeiten
+    Friend neuerEintrag As Boolean = True
 
-    Private mRow As Integer = 0
-    Private newpage As Boolean = True
+    Private startZeile As Integer = 0
+    Private neueSeite As Boolean = True
 
     Private monatssumme As TimeSpan = TimeSpan.Zero
 
@@ -35,6 +36,7 @@ Public Class Form1
 
     End Sub
 
+#Region "Datei öffnen/Schließen"
     Private Sub DatenbankÖffnenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DatenbankÖffnenToolStripMenuItem.Click
         OpenFileDialog1.ShowDialog()
     End Sub
@@ -55,27 +57,33 @@ Public Class Form1
     End Sub
 
     Private Sub SaveFileDialog1_FileOk(sender As Object, e As CancelEventArgs) Handles SaveFileDialog1.FileOk
-        Dim con As New SQLiteConnection()
-        Dim cmd As SQLiteCommand
 
+        Dim alteDatei As Boolean = False
         If File.Exists(SaveFileDialog1.FileName) Then
-            MsgBox("Geht nicht")
-            Exit Sub
-
-            ' Muss erst irgendwo freigegeben werden
-            File.Delete(SaveFileDialog1.FileName)
+            alteDatei = True
         End If
 
-        con.ConnectionString = "Data Source=" & SaveFileDialog1.FileName & ";"
-        cmd = con.CreateCommand()
+        Using con As New SQLiteConnection()
+            Dim cmd As SQLiteCommand
 
-        Try
-            con.Open()
+            con.ConnectionString = "Data Source=" & SaveFileDialog1.FileName & ";"
+            cmd = con.CreateCommand()
 
-            cmd.CommandText = "CREATE TABLE Strassen (SId INTEGER PRIMARY KEY AUTOINCREMENT, Strasse TEXT NOT NULL)"
-            cmd.ExecuteNonQuery()
+            Try
+                con.Open()
 
-            cmd.CommandText = "CREATE TABLE Zeiten (
+                If alteDatei = True Then
+                    cmd.CommandText = "DROP TABLE Strassen;"
+                    cmd.ExecuteNonQuery()
+
+                    cmd.CommandText = "DROP TABLE Zeiten;"
+                    cmd.ExecuteNonQuery()
+                End If
+
+                cmd.CommandText = "CREATE TABLE Strassen (SId INTEGER PRIMARY KEY AUTOINCREMENT, Strasse TEXT NOT NULL)"
+                cmd.ExecuteNonQuery()
+
+                cmd.CommandText = "CREATE TABLE Zeiten (
 	                                ZId	INTEGER PRIMARY KEY AUTOINCREMENT,
 	                                datum	TEXT NOT NULL,
 	                                fkStrasse	INTEGER NOT NULL,
@@ -84,14 +92,16 @@ Public Class Form1
                                     FOREIGN KEY(fkStrasse) REFERENCES Strassen(SId)
                                 );"
 
-            cmd.ExecuteNonQuery()
+                cmd.ExecuteNonQuery()
 
-            con.Close()
+                con.Close()
 
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-            Exit Sub
-        End Try
+            Catch ex As Exception
+                MessageBox.Show(ex.Message)
+                Exit Sub
+            End Try
+
+        End Using
 
         My.Settings.letzteDB = SaveFileDialog1.FileName
         dbDateiPfad = SaveFileDialog1.FileName
@@ -105,187 +115,32 @@ Public Class Form1
         MessageBox.Show("Datenbank gespeichert", "Speichern Erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
-    Private Sub BtnAdd_Click(sender As Object, e As EventArgs) Handles BtnAdd.Click
-        neu = True
-        Eingabe.ShowDialog()
-    End Sub
+#End Region 'Datei öffnen/Schließen
 
-    Friend Sub TabelleEinlesen()
-        Dim con As New SQLiteConnection()
-
-        DataGridView1.Rows.Clear()
-        ds.Clear()
-        monatssumme = TimeSpan.Zero
-
-        If Not File.Exists(dbDateiPfad) Then
-            MsgBox("Alte Datei nicht gefunden. Bitte neue erstellen oder laden.")
-            Exit Sub
-        End If
-
-        Dim cmdEintraege As SQLiteCommand
-        con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
-        cmdEintraege = con.CreateCommand()
-
-        ' Bekommen ausgewählten und nächsten monat
-        Dim monat As String = ""
-        Dim nmonat As String = ""
-        Dim jahr As String = ""
-        Dim njahr As String = ""
-
-        monat = (CBMonat.SelectedIndex + 1).ToString("D2")
-        nmonat = (CBMonat.SelectedIndex + 2).ToString("D2")
-
-
-        jahr = CBJahr.SelectedItem
-        If CBMonat.SelectedIndex >= 11 Then
-            njahr = CBJahr.SelectedItem + 1
-            nmonat = "01"
-        Else
-            njahr = jahr
-        End If
-
-
-        Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('" & jahr & "-" & monat & "-01') AND date(datum) < date('" & njahr & "-" & nmonat & "-01')"
-
-        Dim LetzteZeit As Date
-        Dim Tagessumme As TimeSpan = TimeSpan.Zero
-        Dim NeuerTag As Boolean = True
-
-        Dim Background1 As Color = Color.FromArgb(&HFF90CAF9)
-        Dim Background2 As Color = Color.FromArgb(&HFFC3FDFF)
-        Dim aktFarbe As Color = Background1
-
-        Try
-            con.Open()
-
-            Dim da = New SQLiteDataAdapter(Querry, con)
-            da.Fill(ds)
-
-            For i As Integer = 0 To ds.Tables(0).Rows.Count - 1
-                With ds.Tables(0)
-
-                    Dim datum As Date = .Rows(i).Item("datum")
-
-                    Dim test = 0
-
-                    If IsDBNull(.Rows(i).Item("endzeit")) = True Then
-                        test += 1
-                    End If
-
-                    If IsDBNull(.Rows(i).Item("startzeit")) = True Then
-                        test += 2
-                    End If
-
-                    If NeuerTag = True Then
-                        If aktFarbe.Equals(Background1) = True Then
-                            aktFarbe = Background2
-                        Else
-                            aktFarbe = Background1
-                        End If
-                    End If
-
-                    Select Case test
-                        Case 0
-                            Dim stunden = DateDiff(DateInterval.Hour, .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"))
-                            Dim minuten = DateDiff(DateInterval.Minute, .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit")) Mod 60
-                            Dim duration As TimeSpan
-                            TimeSpan.TryParse(stunden & ":" & minuten, duration)
-
-                            If NeuerTag = True Then
-                                Tagessumme = duration
-                            End If
-
-                            If NeuerTag = False Then
-                                Tagessumme += duration
-                            End If
-
-                            If i < .Rows.Count - 1 Then
-                                If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
-
-
-                                    NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
-
-                                Else
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
-                                    monatssumme += Tagessumme
-                                    Tagessumme = TimeSpan.Zero
-
-                                    NeuerTag = True
-
-                                End If
-
-                            Else
-                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
-                                monatssumme += Tagessumme
-                            End If
-
-                        Case 1
-                            If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
-                                NeuerTag = False
-                            End If
-                            DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
-
-                            LetzteZeit = .Rows(i).Item("startzeit")
-
-                        Case 2
-                            Dim stunden = DateDiff(DateInterval.Hour, LetzteZeit, .Rows(i).Item("endzeit"))
-                            Dim minuten = DateDiff(DateInterval.Minute, LetzteZeit, .Rows(i).Item("endzeit")) Mod 60
-                            Dim duration As TimeSpan
-                            TimeSpan.TryParse(stunden & ":" & minuten, duration)
-
-                            If NeuerTag = True Then
-                                Tagessumme = duration
-                            End If
-
-                            If NeuerTag = False Then
-                                Tagessumme += duration
-                            End If
-
-                            If i < .Rows.Count - 1 Then
-                                If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
-
-                                    NeuerTag = False
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
-
-                                Else
-
-                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
-                                    monatssumme += Tagessumme
-                                    Tagessumme = TimeSpan.Zero
-
-                                    NeuerTag = True
-
-                                End If
-
-                            Else
-                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
-                                monatssumme += Tagessumme
-                            End If
-
-                        Case 3
-                            DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
-
-                    End Select
-
-                End With
-
-                For Each cell In DataGridView1.Rows(i).Cells
-                    cell.Style.BackColor = aktFarbe
-                Next
-            Next
-
-            con.Close()
-
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
-    End Sub
-
+#Region "Toolstrip"
     Private Sub BeendenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeendenToolStripMenuItem.Click
         Me.Close()
     End Sub
 
+    Private Sub ResetToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ResetToolStripMenuItem.Click
+        My.Settings.Reset()
+        DataGridView1.Rows.Clear()
+        monatssumme = TimeSpan.Zero
+        BtnAdd.Enabled = False
+        BtnDruck.Enabled = False
+        CBJahr.Enabled = False
+        CBMonat.Enabled = False
+        AktualisiereAbrechnung()
+
+    End Sub
+
+    Private Sub BearbeitenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BearbeitenToolStripMenuItem.Click
+        FrmEinstellungen.Show()
+    End Sub
+
+#End Region 'Toolstrip
+
+#Region "druck"
     Private Sub BtnDruck_Click(sender As Object, e As EventArgs) Handles BtnDruck.Click
         Dim ppd As New PrintPreviewDialog
         ppd.Document = PrintDocument1
@@ -296,8 +151,8 @@ Public Class Form1
     Private Sub PrintDocument1_BeginPrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles PrintDocument1.BeginPrint
         PrintDocument1.OriginAtMargins = True
         PrintDocument1.DefaultPageSettings.Margins = New Drawing.Printing.Margins(20, 20, 20, 20)
-        mRow = 0
-        newpage = True
+        startZeile = 0
+        neueSeite = True
     End Sub
 
     ' https://stackoverflow.com/questions/41015287/how-to-print-datagridview-table-with-its-header-in-vb-net
@@ -328,10 +183,11 @@ Public Class Form1
         y += 36
 
         '   Drucke Header
-        If newpage Then
-            row = DataGridView1.Rows(mRow)
+        If neueSeite Then
+            row = DataGridView1.Rows(startZeile)
             x = e.MarginBounds.Left
             For Each cell As DataGridViewCell In row.Cells
+                ' Überspringe ID Spalte
                 If cell.Visible Then
 
                     rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
@@ -378,19 +234,21 @@ Public Class Form1
             y = h + e.MarginBounds.Top + 36
 
         End If
-        newpage = False
+        neueSeite = False
 
         ' Drucke Datenreihen
-        Dim thisNDX As Integer
-        For thisNDX = mRow To DataGridView1.RowCount - 1
+        Dim aktZeile As Integer
+        For aktZeile = startZeile To DataGridView1.RowCount - 1
 
-            row = DataGridView1.Rows(thisNDX)
+            row = DataGridView1.Rows(aktZeile)
             h = 0
 
             ' reset X um von links anzufangen
             x = e.MarginBounds.Left
 
             For Each cell As DataGridViewCell In row.Cells
+
+                ' Überspringe ID Spalte
                 If cell.Visible Then
                     rc = New Rectangle(x, y, cell.Size.Width + 10, cell.Size.Height)
 
@@ -399,7 +257,6 @@ Public Class Form1
                     End Using
 
                     e.Graphics.DrawRectangle(Pens.Black, rc)
-
                     e.Graphics.DrawString(cell.FormattedValue.ToString(), DataGridView1.Font, Brushes.Black, rc, fmt)
 
                     x += rc.Width
@@ -408,18 +265,43 @@ Public Class Form1
 
             Next
             y += h
-            ' next row to print
-            mRow = thisNDX + 1
+            ' nächste Zeile
+            startZeile = aktZeile + 1
 
+            ' Neue Seite, wenn nicht alles auf die aktuelle passt
             If y + h > e.MarginBounds.Bottom Then
                 e.HasMorePages = True
-                newpage = True
+                neueSeite = True
                 Return
             End If
         Next
 
     End Sub
 
+#End Region  ' Druck
+
+#Region "hinzufügen und bearbeiten"
+    Private Sub BtnAdd_Click(sender As Object, e As EventArgs) Handles BtnAdd.Click
+        neuerEintrag = True
+        Eingabe.ShowDialog()
+    End Sub
+    Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
+        If My.Settings.letzteDB <> "" Then
+            TabelleEinlesen()
+            AktualisiereAbrechnung()
+        End If
+    End Sub
+    Private Sub CBJahr_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBJahr.SelectedIndexChanged
+        If My.Settings.letzteDB <> "" Then
+            TabelleEinlesen()
+            AktualisiereAbrechnung()
+        End If
+    End Sub
+    Private Sub DataGridView1_CellContentDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentDoubleClick
+        neuerEintrag = False
+        Eingabe.ShowDialog()
+    End Sub
+#End Region 'hinzufügen und bearbeiten
 
     Friend Sub AktualisiereAbrechnung()
         Dim lohn As Double
@@ -445,39 +327,176 @@ Public Class Form1
         TBUeberStd.Text = FormatCurrency(lohnUeber, 2, TriState.True)
         TBLohnGes.Text = FormatCurrency(lohnGes, 2, TriState.True)
     End Sub
+    Friend Sub TabelleEinlesen()
+        Using con As New SQLiteConnection()
 
-    Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
-        If My.Settings.letzteDB <> "" Then
-            TabelleEinlesen()
-            AktualisiereAbrechnung()
-        End If
-    End Sub
-    Private Sub CBJahr_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBJahr.SelectedIndexChanged
-        If My.Settings.letzteDB <> "" Then
-            TabelleEinlesen()
-            AktualisiereAbrechnung()
-        End If
-    End Sub
+            DataGridView1.Rows.Clear()
+            ds.Clear()
+            monatssumme = TimeSpan.Zero
+
+            If Not File.Exists(dbDateiPfad) Then
+                MsgBox("Alte Datei nicht gefunden. Bitte neue erstellen oder laden.")
+                Exit Sub
+            End If
+
+            Dim cmdEintraege As SQLiteCommand
+            con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
+            cmdEintraege = con.CreateCommand()
+
+            ' Bekommen ausgewählten und nächsten monat
+            Dim monat As String = ""
+            Dim nmonat As String = ""
+            Dim jahr As String = ""
+            Dim njahr As String = ""
+
+            monat = (CBMonat.SelectedIndex + 1).ToString("D2")
+            nmonat = (CBMonat.SelectedIndex + 2).ToString("D2")
 
 
-    Private Sub ResetToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ResetToolStripMenuItem.Click
-        My.Settings.Reset()
-        DataGridView1.Rows.Clear()
-        monatssumme = TimeSpan.Zero
-        BtnAdd.Enabled = False
-        BtnDruck.Enabled = False
-        CBJahr.Enabled = False
-        CBMonat.Enabled = False
-        AktualisiereAbrechnung()
+            jahr = CBJahr.SelectedItem
+            If CBMonat.SelectedIndex >= 11 Then
+                njahr = CBJahr.SelectedItem + 1
+                nmonat = "01"
+            Else
+                njahr = jahr
+            End If
 
-    End Sub
 
-    Private Sub BearbeitenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BearbeitenToolStripMenuItem.Click
-        FrmEinstellungen.Show()
-    End Sub
+            Dim Querry = "SELECT * FROM Zeiten JOIN Strassen on Zeiten.fkStrasse = Strassen.SId WHERE date(datum) >= date('" & jahr & "-" & monat & "-01') AND date(datum) < date('" & njahr & "-" & nmonat & "-01')"
 
-    Private Sub DataGridView1_CellContentDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentDoubleClick
-        neu = False
-        Eingabe.ShowDialog()
+            Dim LetzteZeit As Date
+            Dim Tagessumme As TimeSpan = TimeSpan.Zero
+            Dim NeuerTag As Boolean = True
+
+            Dim Background1 As Color = Color.FromArgb(&HFF90CAF9)
+            Dim Background2 As Color = Color.FromArgb(&HFFC3FDFF)
+            Dim aktFarbe As Color = Background1
+
+            Try
+                con.Open()
+
+                Dim da = New SQLiteDataAdapter(Querry, con)
+                da.Fill(ds)
+
+                For i As Integer = 0 To ds.Tables(0).Rows.Count - 1
+                    With ds.Tables(0)
+
+                        Dim datum As Date = .Rows(i).Item("datum")
+
+                        Dim test = 0
+
+                        If IsDBNull(.Rows(i).Item("endzeit")) = True Then
+                            test += 1
+                        End If
+
+                        If IsDBNull(.Rows(i).Item("startzeit")) = True Then
+                            test += 2
+                        End If
+
+                        ' Ändere Hintergundfarbe, wenn neuer Tag
+                        If NeuerTag = True Then
+                            If aktFarbe.Equals(Background1) = True Then
+                                aktFarbe = Background2
+                            Else
+                                aktFarbe = Background1
+                            End If
+                        End If
+
+                        Select Case test
+                            Case 0
+                                Dim stunden = DateDiff(DateInterval.Hour, .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"))
+                                Dim minuten = DateDiff(DateInterval.Minute, .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit")) Mod 60
+                                Dim duration As TimeSpan
+                                TimeSpan.TryParse(stunden & ":" & minuten, duration)
+
+                                If NeuerTag = True Then
+                                    Tagessumme = duration
+                                End If
+
+                                If NeuerTag = False Then
+                                    Tagessumme += duration
+                                End If
+
+                                If i < .Rows.Count - 1 Then
+                                    If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
+
+
+                                        NeuerTag = False
+                                        DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, " "})
+
+                                    Else
+                                        DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                        monatssumme += Tagessumme
+                                        Tagessumme = TimeSpan.Zero
+
+                                        NeuerTag = True
+
+                                    End If
+
+                                Else
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    monatssumme += Tagessumme
+                                End If
+
+                            Case 1
+                                If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
+                                    NeuerTag = False
+                                End If
+                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), .Rows(i).Item("startzeit"), " ", " ", " "})
+
+                                LetzteZeit = .Rows(i).Item("startzeit")
+
+                            Case 2
+                                Dim stunden = DateDiff(DateInterval.Hour, LetzteZeit, .Rows(i).Item("endzeit"))
+                                Dim minuten = DateDiff(DateInterval.Minute, LetzteZeit, .Rows(i).Item("endzeit")) Mod 60
+                                Dim duration As TimeSpan
+                                TimeSpan.TryParse(stunden & ":" & minuten, duration)
+
+                                If NeuerTag = True Then
+                                    Tagessumme = duration
+                                End If
+
+                                If NeuerTag = False Then
+                                    Tagessumme += duration
+                                End If
+
+                                If i < .Rows.Count - 1 Then
+                                    If .Rows(i + 1).Item("datum") = .Rows(i).Item("datum") Then
+
+                                        NeuerTag = False
+                                        DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, " "})
+
+                                    Else
+                                        DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                        monatssumme += Tagessumme
+                                        Tagessumme = TimeSpan.Zero
+
+                                        NeuerTag = True
+
+                                    End If
+
+                                Else
+                                    DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", .Rows(i).Item("endzeit"), duration, Tagessumme})
+                                    monatssumme += Tagessumme
+                                End If
+
+                            Case 3
+                                DataGridView1.Rows.Add({ .Rows(i).Item("ZID"), datum.ToString("dd.MM.yyyy"), .Rows(i).Item("Strasse"), " ", " ", " ", " "})
+
+                        End Select
+
+                    End With
+
+                    For Each cell In DataGridView1.Rows(i).Cells
+                        cell.Style.BackColor = aktFarbe
+                    Next
+                Next
+
+                con.Close()
+
+            Catch ex As Exception
+                MessageBox.Show(ex.Message)
+            End Try
+        End Using
     End Sub
 End Class
