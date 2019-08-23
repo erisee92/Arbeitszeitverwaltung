@@ -5,11 +5,12 @@ Imports System.IO
 Public Class Form1
 
     Friend dbDateiPfad As String
-    Dim ds As New DataSet
+    Private ds As New DataSet
 
     'Neuer Eintrag oder bearbeiten
     Friend neuerEintrag As Boolean = True
 
+    ' Variablen für den Druck
     Private startZeile As Integer = 0
     Private neueSeite As Boolean = True
 
