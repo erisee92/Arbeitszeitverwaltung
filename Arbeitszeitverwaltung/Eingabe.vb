@@ -2,6 +2,9 @@
 
 Public Class Eingabe
 
+    Private Sub Eingabe_Load(sender As Object, e As EventArgs) Handles Me.Load
+        DTPStart.Checked = True
+    End Sub
 
     Private Sub Eingabe_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
@@ -90,8 +93,8 @@ Public Class Eingabe
 
         Dim SId
 
-        'Try
-        con.Open()
+        Try
+            con.Open()
 
             SId = cmd.ExecuteScalar
 
@@ -103,6 +106,8 @@ Public Class Eingabe
                 Querry = "SELECT max(SId) FROM Strassen"
                 cmd.CommandText = Querry
                 SId = cmd.ExecuteScalar
+
+                TBStrasse.AutoCompleteCustomSource.Add(TBStrasse.Text)
             End If
 
             If Form1.neuerEintrag = True Then
@@ -114,10 +119,12 @@ Public Class Eingabe
                 ElseIf DTPStart.Checked = True And DTPEnde.Checked = False Then
                     Querry = "INSERT INTO Zeiten(datum, fkStrasse, startzeit) VALUES ('" & datum & "', " & SId & ", '" & startZeit & "');"
                     DTPStart.Checked = False
+                    DTPStart.Enabled = False
 
                 ElseIf DTPStart.Checked = False And DTPEnde.Checked = True Then
                     Querry = "INSERT INTO Zeiten(datum, fkStrasse, endzeit) VALUES ('" & datum & "', " & SId & ", '" & endZeit & "');"
                     DTPStart.Checked = True
+                    DTPStart.Enabled = True
                     DTPEnde.Checked = False
 
                 Else
@@ -162,9 +169,9 @@ Public Class Eingabe
             TBStrasse.Text = ""
 
 
-        'Catch ex As Exception
-        '    MessageBox.Show(ex.Message)
-        'End Try
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
 
         If Form1.neuerEintrag = False Then
             Me.Hide()
