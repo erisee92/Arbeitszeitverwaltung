@@ -344,7 +344,7 @@ Public Class Form1
             con.ConnectionString = "Data Source=" & dbDateiPfad & ";"
             cmdEintraege = con.CreateCommand()
 
-            ' Bekommen ausgewählten und nächsten monat
+            ' Ausgewählter/s und nächster/s Monat/ Jahr
             Dim monat As String = ""
             Dim nmonat As String = ""
             Dim jahr As String = ""
