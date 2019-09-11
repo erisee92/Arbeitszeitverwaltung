@@ -76,7 +76,13 @@ Public Class Eingabe
 
 
         If strasse = "" Or strasse = " " Then
-            MessageBox.Show("Bitte eine Straße eintragen", "Straßenname leer", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+
+            Dim tooltip As New ToolTip With {
+                .ToolTipTitle = "Bitte eine Straße eintragen",
+                .IsBalloon = True,
+                .ToolTipIcon = ToolTipIcon.Warning
+            }
+            tooltip.Show("Darf nicht leer sein", Me, New Point(TBStrasse.Left, TBStrasse.Top - 40), 2000)
             Exit Sub
         End If
 

@@ -284,7 +284,7 @@ Public Class Form1
 #Region "hinzufügen und bearbeiten"
     Private Sub BtnAdd_Click(sender As Object, e As EventArgs) Handles BtnAdd.Click
         neuerEintrag = True
-        Eingabe.ShowDialog()
+        Eingabe.Show()
     End Sub
     Private Sub CBMonat_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CBMonat.SelectedIndexChanged
         If My.Settings.letzteDB <> "" Then
@@ -300,7 +300,7 @@ Public Class Form1
     End Sub
     Private Sub DataGridView1_CellContentDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentDoubleClick
         neuerEintrag = False
-        Eingabe.ShowDialog()
+        Eingabe.Show()
     End Sub
 #End Region 'hinzufügen und bearbeiten
 
