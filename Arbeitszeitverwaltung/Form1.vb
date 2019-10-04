@@ -305,6 +305,11 @@ Public Class Form1
         x = e.MarginBounds.Right - 50
         e.Graphics.DrawString("Seite " + seitenNummer.ToString, Label1.Font, Brushes.Black, x, y)
 
+        startZeile = 0
+        neueSeite = True
+        seitenNummer = 1
+        ueStunden = False
+
     End Sub
 
 #End Region  ' Druck
