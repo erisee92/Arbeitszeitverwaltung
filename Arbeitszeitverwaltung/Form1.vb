@@ -13,6 +13,7 @@ Public Class Form1
     ' Variablen für den Druck
     Private startZeile As Integer = 0
     Private neueSeite As Boolean = True
+    Private seitenNummer As Integer = 1
 
     Private monatssumme As TimeSpan = TimeSpan.Zero
 
@@ -174,7 +175,7 @@ Public Class Form1
         Dim Schrift As New Font(FontFamily.GenericSansSerif, 14.0)
         x = e.MarginBounds.Left
 
-        rc = New Rectangle(x, y + 5, PrintDocument1.DefaultPageSettings.PrintableArea.Width, 25)
+        rc = New Rectangle(x, y, PrintDocument1.DefaultPageSettings.PrintableArea.Width, 25)
         Dim sf As New StringFormat
         sf.Alignment = StringAlignment.Center
         sf.LineAlignment = StringAlignment.Center
@@ -205,37 +206,39 @@ Public Class Form1
                 End If
             Next
 
-            ' Lohnrechnung
-            x += 20
-            y = e.MarginBounds.Top + h + 36
+            If seitenNummer = 1 Then
+                ' Lohnrechnung
+                x += 20
+                y = e.MarginBounds.Top + h + 36
 
-            e.Graphics.DrawString(Label1.Text, Label1.Font, Brushes.Black, x, y)
-            x += 150
-            e.Graphics.DrawString(TBSumme.Text, TBSumme.Font, Brushes.Black, x, y)
-            y += Label1.Height + 5
+                e.Graphics.DrawString(Label1.Text, Label1.Font, Brushes.Black, x, y)
+                x += 160
+                e.Graphics.DrawString(TBSumme.Text, TBSumme.Font, Brushes.Black, x, y)
+                y += Label1.Height + 5
 
-            x -= 150
-            e.Graphics.DrawString(Label2.Text, Label2.Font, Brushes.Black, x, y)
-            x += 150
-            e.Graphics.DrawString(TBLohn.Text, TBLohn.Font, Brushes.Black, x, y)
-            y += Label1.Height + 5
+                x -= 160
+                e.Graphics.DrawString(Label2.Text, Label2.Font, Brushes.Black, x, y)
+                x += 160
+                e.Graphics.DrawString(TBLohn.Text, TBLohn.Font, Brushes.Black, x, y)
+                y += Label1.Height + 5
 
-            x -= 150
-            e.Graphics.DrawString(Label3.Text, Label3.Font, Brushes.Black, x, y)
-            x += 150
-            e.Graphics.DrawString(TBUeberStd.Text, TBUeberStd.Font, Brushes.Black, x, y)
-            y += Label1.Height + 5
+                'x -= 150
+                'e.Graphics.DrawString(Label3.Text, Label3.Font, Brushes.Black, x, y)
+                'x += 150
+                'e.Graphics.DrawString(TBUeberStd.Text, TBUeberStd.Font, Brushes.Black, x, y)
+                'y += Label1.Height + 5
 
-            x -= 150
-            e.Graphics.DrawString(Label4.Text, Label4.Font, Brushes.Black, x, y)
-            x += 150
-            e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
-            y += Label1.Height + 5
+                'x -= 150
+                'e.Graphics.DrawString(Label4.Text, Label4.Font, Brushes.Black, x, y)
+                'x += 150
+                'e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
+                'y += Label1.Height + 5
 
-            y = h + e.MarginBounds.Top + 36
+                y = h + e.MarginBounds.Top + 36
+            End If
 
         End If
-        neueSeite = False
+            neueSeite = False
 
         ' Drucke Datenreihen
         Dim aktZeile As Integer
@@ -273,9 +276,21 @@ Public Class Form1
             If y + h > e.MarginBounds.Bottom Then
                 e.HasMorePages = True
                 neueSeite = True
+
+
+                y = e.MarginBounds.Bottom - 20
+                x = e.MarginBounds.Right - 50
+                e.Graphics.DrawString("Seite " + seitenNummer.ToString, Label1.Font, Brushes.Black, x, y)
+
+                seitenNummer += 1
+
                 Return
             End If
         Next
+
+        y = e.MarginBounds.Bottom - 20
+        x = e.MarginBounds.Right - 50
+        e.Graphics.DrawString("Seite " + seitenNummer.ToString, Label1.Font, Brushes.Black, x, y)
 
     End Sub
 
