@@ -14,6 +14,7 @@ Public Class Form1
     Private startZeile As Integer = 0
     Private neueSeite As Boolean = True
     Private seitenNummer As Integer = 1
+    Private ueStunden As Boolean = False
 
     Private monatssumme As TimeSpan = TimeSpan.Zero
 
@@ -144,6 +145,16 @@ Public Class Form1
 
 #Region "druck"
     Private Sub BtnDruck_Click(sender As Object, e As EventArgs) Handles BtnDruck.Click
+
+        startZeile = 0
+        neueSeite = True
+        seitenNummer = 1
+        ueStunden = False
+
+        If MessageBox.Show("Drucke mit Überstunden?", "Druckausgabe", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+            ueStunden = True
+        End If
+
         Dim ppd As New PrintPreviewDialog
         ppd.Document = PrintDocument1
         ppd.WindowState = FormWindowState.Maximized
@@ -208,7 +219,7 @@ Public Class Form1
 
             If seitenNummer = 1 Then
                 ' Lohnrechnung
-                x += 20
+                x += 30
                 y = e.MarginBounds.Top + h + 36
 
                 e.Graphics.DrawString(Label1.Text, Label1.Font, Brushes.Black, x, y)
@@ -222,17 +233,19 @@ Public Class Form1
                 e.Graphics.DrawString(TBLohn.Text, TBLohn.Font, Brushes.Black, x, y)
                 y += Label1.Height + 5
 
-                'x -= 150
-                'e.Graphics.DrawString(Label3.Text, Label3.Font, Brushes.Black, x, y)
-                'x += 150
-                'e.Graphics.DrawString(TBUeberStd.Text, TBUeberStd.Font, Brushes.Black, x, y)
-                'y += Label1.Height + 5
+                If ueStunden Then
+                    x -= 160
+                    e.Graphics.DrawString(Label3.Text, Label3.Font, Brushes.Black, x, y)
+                    x += 160
+                    e.Graphics.DrawString(TBUeberStd.Text, TBUeberStd.Font, Brushes.Black, x, y)
+                    y += Label1.Height + 5
 
-                'x -= 150
-                'e.Graphics.DrawString(Label4.Text, Label4.Font, Brushes.Black, x, y)
-                'x += 150
-                'e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
-                'y += Label1.Height + 5
+                    x -= 160
+                    e.Graphics.DrawString(Label4.Text, Label4.Font, Brushes.Black, x, y)
+                    x += 160
+                    e.Graphics.DrawString(TBLohnGes.Text, TBLohnGes.Font, Brushes.Black, x, y)
+                    y += Label1.Height + 5
+                End If
 
                 y = h + e.MarginBounds.Top + 36
             End If
